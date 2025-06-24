@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Raumplanung Nachhilfe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      color: #333;
+    }
+    .container {
+      width: 95%;
+      max-width: 700px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      padding: 25px 30px;
+      margin-top: 20px;
+    }
+    h2 {
+      margin-top: 0;
+      color: #2a2a72;
+      text-align: center;
+    }
+    .login {
+      text-align: center;
+    }
+    #username {
+      width: 70%;
+      max-width: 300px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      border: 2px solid #9face6;
+      border-radius: 6px;
+      outline-offset: 2px;
+      transition: border-color 0.3s;
+    }
+    #username:focus {
+      border-color: #2a2a72;
+    }
+    button {
+      margin-left: 10px;
+      background-color: #2a2a72;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #1f1f54;
+    }
+    .date-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .date-item {
+      background-color: #f0f4ff;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      user-select: none;
+      font-weight: 600;
+      transition: background-color 0.3s, border-color 0.3s;
+      line-height: 1.3;
+      white-space: pre-line;
+    }
+    .date-item:hover {
+      background-color: #d0d8ff;
+      border-color: #2a2a72;
+    }
+    .date-item.selected {
+      background-color: #2a2a72;
+      color: white;
+      border-color: #1f1f54;
+    }
+    .time-table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .time-table th, .time-table td {
+      border: 1px solid #ddd;
+      padding: 8px 6px;
+      text-align: center;
+      vertical-align: middle;
+      word-wrap: break-word;
+    }
+    .time-table thead {
+      background-color: #2a2a72;
+      color: white;
+      user-select: none;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f7f9fc;
+    }
+    .cell-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background-color 0.3s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .cell-button:hover {
+      background-color: #3a8d3a;
+    }
+    .occupied {
+      background-color: #ffcccc;
+      color: #a60000;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 6px 6px;
+      position: relative;
+      word-break: break-word;
+    }
+    .occupied.self {
+      background-color: #c6f6d5;
+      color: #22543d;
+    }
+    .occupied button {
+      margin-top: 6px;
+      background-color: #e53e3e;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .occupied button:hover {
+      background-color: #9b2c2c;
+    }
+    #backToDates {
+      margin-top: 15px;
+      background-color: #444;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      font-weight: 600;
+      border: none;
+      transition: background-color 0.3s;
+    }
+    #backToDates:hover {
+      background-color: #222;
+    }
+    #loginError {
+      color: #e53e3e;
+      margin-top: 8px;
+      font-weight: 600;
+      display: none;
+    }
+    @media (max-width: 700px) {
+      #username {
+        width: 100%;
+        max-width: none;
+        margin-bottom: 12px;
+      }
+      button {
+        margin-left: 0;
+        width: 100%;
+      }
+      .date-list {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+      }
+      .time-table, .time-table thead, .time-table tbody, .time-table th, .time-table td, .time-table tr {
+        display: block;
+      }
+      .time-table thead tr {
+        display: none;
+      }
+      .time-table tbody tr {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+      }
+      .time-table tbody td {
+        border: none;
+        padding: 6px 10px;
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+      }
+      .time-table tbody td::before {
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        content: attr(data-label);
+      }
+      .cell-button, .occupied button {
+        width: auto;
+        display: inline-block;
+        margin-top: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="login" id="loginBox">
+    <h2>Login</h2>
+    <p>Gib deinen Lehrernamen ein (z. B. Anna Müller):</p>
+    <input type="text" id="username" placeholder="Dein Name" autocomplete="off" />
+    <button onclick="login()">Einloggen</button>
+    <p id="loginError"></p>
+  </div>
+
+  <div class="dashboard" id="dashboard" style="display:none">
+    <h2>Willkommen, <span id="userDisplay"></span></h2>
+    <p>Wähle ein Datum aus, um Buchungen vorzunehmen:</p>
+    <div id="dateList" class="date-list"></div>
+
+    <div id="timeSlotSection" style="display:none;">
+      <button id="backToDates" onclick="showDateList()">← Zurück zur Datumsauswahl</button>
+      <h3>Buchungen für <span id="selectedDate"></span></h3>
+      <table class="time-table">
+        <thead>
+          <tr>
+            <th>Zeit</th>
+            <th>Raum A</th>
+            <th>Raum B</th>
+          </tr>
+        </thead>
+        <tbody id="timeSlotsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const erlaubteLehrer = [
+    "anna müller",
+    "max meier",
+    "lena schmidt"
+  ];
+
+  const zeiten = [];
+  for(let h = 6; h < 20; h++) {
+    zeiten.push(`${String(h).padStart(2,'0')}:00-${String(h).padStart(2,'0')}:30`);
+    zeiten.push(`${String(h).padStart(2,'0')}:30-${String(h+1).padStart(2,'0')}:00`);
+  }
+
+  const tage = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+
+  let aktuellerUser = "";
+  let belegung = {}; // key = "datum|zeit" => { A: "", B: "" }
+  let aktuellesDatum = null;
+
+  function login() {
+    const input = document.getElementById("username");
+    const name = input.value.trim();
+    const loginError = document.getElementById("loginError");
+    loginError.style.display = "none";
+
+    if (!name) {
+      loginError.innerText = "Bitte gib deinen Namen ein.";
+      loginError.style.display = "block";
+      return;
+    }
+
+    if (!erlaubteLehrer.includes(name.toLowerCase())) {
+      loginError.innerText = "Zugriff verweigert. Dein Name ist nicht in der Lehrer-Liste.";
+      loginError.style.display = "block";
+      return;
+    }
+
+    aktuellerUser = name;
+    document.getElementById("userDisplay").innerText = aktuellerUser;
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    showDateList();
+  }
+
+  function formatDatumMitWochentag(datumStr) {
+    const dateObj = new Date(datumStr);
+    const wochentage = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+    const tag = dateObj.getDate();
+    const monat = dateObj.getMonth() + 1;
+    const jahr = dateObj.getFullYear();
+    const wtag = wochentage[dateObj.getDay()];
+    return `${wtag}\n${tag}.${monat.toString().padStart(2, "0")}.${jahr}`;
+  }
+
+  function formatDatum(datumStr) {
+    const dateObj = new Date(datumStr);
+    const wochentage = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+    const wtag = wochentage[dateObj.getDay()];
+    const [y,m,d] = datumStr.split("-");
+    return `${wtag} ${d}.${m}.${y}`;
+  }
+
+  function showDateList() {
+    aktuellesDatum = null;
+    document.getElementById("timeSlotSection").style.display = "none";
+    document.getElementById("dateList").style.display = "grid";
+
+    const dateList = document.getElementById("dateList");
+    dateList.innerHTML = "";
+    tage.forEach(tag => {
+      const div = document.createElement("div");
+      div.className = "date-item";
+      div.innerText = formatDatumMitWochentag(tag);
+      div.title = tag;
+      div.onclick = () => {
+        aktuellesDatum = tag;
+        showTimeSlotsForDate(tag);
+      };
+      dateList.appendChild(div);
+    });
+  }
+
+  function showTimeSlotsForDate(datum) {
+    document.getElementById("dateList").style.display = "none";
+    document.getElementById("timeSlotSection").style.display = "block";
+    document.getElementById("selectedDate").innerText = formatDatum(datum);
+
+    const tbody = document.getElementById("timeSlotsBody");
+    tbody.innerHTML = "";
+
+    zeiten.forEach(zeit => {
+      const key = `${datum}|${zeit}`;
+      if (!belegung[key]) belegung[key] = { A: "", B: "" };
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td data-label="Zeit">${zeit}</td>
+        <td data-label="Raum A">${renderCell(key, 'A')}</td>
+        <td data-label="Raum B">${renderCell(key, 'B')}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function renderCell(key, raum) {
+    const name = belegung[key][raum];
+    if (!name) {
+      return `<button class="cell-button" onclick="eintragen('${key}','${raum}')">Eintragen</button>`;
+    } else if (name === aktuellerUser) {
+      return `<div class="occupied self">${name}<br><button onclick="austragen('${key}','${raum}')">Austragen</button></div>`;
+    } else {
+      return `<div class="occupied">${name}</div>`;
+    }
+  }
+
+  function eintragen(key, raum) {
+    if (!belegung[key][raum]) {
+      belegung[key][raum] = aktuellerUser;
+      showTimeSlotsForDate(aktuellesDatum);
+    }
+  }
+
+  function austragen(key, raum) {
+    if (belegung[key][raum] === aktuellerUser) {
+      belegung[key][raum] = "";
+      showTimeSlotsForDate(aktuellesDatum);
+    }
+  }
+</script>
+
+</body>
+</html>
