@@ -195,8 +195,8 @@ font-weight: 600;
         display: flex;
         justify-content: center;
         gap: 15px;
-        margin-bottom: 20px;
         flex-wrap: wrap;
+        margin-bottom: 20px;
     }
     .room-selection label {
         background-color: #f0f0f0;
@@ -223,12 +223,13 @@ font-weight: 600;
 
 .time-slots {
 margin-top: 20px;
-display: flex;
+display: grid; /* Changed to grid */
+grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Auto-fill columns */
 gap: 15px;
-flex-wrap: wrap;
+/* flex-wrap: wrap; Removed as grid handles wrapping */
 }
 .slot {
-flex: 1 1 90px;
+/* flex: 1 1 90px; Removed flex properties as using grid */
 min-width: 90px;
 background-color: #e0e0e0;
 color: #333;
@@ -268,42 +269,37 @@ margin-top: 30px;
 border-top: 2px solid #bcaaa4;
 padding-top: 20px;
 }
-.whitelist-management {
-margin-top: 10px;
-}
-.whitelist-management ul {
-list-style: none;
-padding: 0;
-}
-.whitelist-management li {
-background: #f5f5f5;
-margin: 5px 0;
-padding: 6px 10px;
-border-radius: 6px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-.whitelist-management button.remove-btn {
-background: #ef5350;
-padding: 4px 8px;
-font-size: 0.85rem;
-border-radius: 4px;
-color: white;
-border: none;
-cursor: pointer;
-transition: background-color 0.3s ease;
-}
-.whitelist-management button.remove-btn:hover {
-background: #e53935;
-}
-.add-user-form {
-margin-top: 10px;
-}
-.add-user-form input[type="text"] {
-width: auto;
-margin-right: 8px;
-}
+/* Removed .whitelist-management and its children styles */
+
+    .user-management {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #ddd;
+    }
+    .user-management ul {
+        list-style: none;
+        padding: 0;
+    }
+    .user-management li {
+        background: #fcfcfc;
+        margin: 5px 0;
+        padding: 10px 15px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .user-management button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    .delete-account-container { /* New style for delete account button container */
+        text-align: right;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
 footer {
 text-align: center;
 padding: 12px 0;
@@ -385,6 +381,7 @@ font-size: 0.9rem;
 <section class="dashboard" style="display:none;">
     <div class="current-user-info">
         Du bist eingeloggt als: <span id="userNameDisplay"></span>
+        <span id="userApprovalStatus" style="margin-left: 10px; font-weight: bold;"></span>
     </div>
 <h2>Termin buchen</h2>
 <p>Klicke auf ein Datum, um Zeiten zu sehen und dich ein- oder auszutragen.</p>
@@ -397,21 +394,22 @@ font-size: 0.9rem;
 <div id="datesContainer" class="date-grid"></div>
 <div id="timeSlotsContainer" class="time-slots" style="display:none;"></div>
 <button id="logoutBtn" style="margin-top:15px;">Ausloggen</button>
-    <button id="deleteAccountBtn" style="background:#c62828; margin-top:10px;">Konto löschen</button> <!-- NEW: Delete account button -->
+    <div class="delete-account-container"> <!-- New container for delete button -->
+        <button id="deleteAccountBtn" style="background:#c62828;">Konto löschen</button>
+    </div>
 </section>
 
 <section class="adminPanel" style="display:none;">
 <h2>Admin-Bereich</h2>
 <button id="clearAllBookingsBtn" style="background:#ef5350;">Alle Buchungen löschen</button>
 
-<div class="whitelist-management">
-<h3>Lehrer-Whitelist verwalten</h3>
-<ul id="teacherList"></ul>
-<form id="addTeacherForm" class="add-user-form">
-<input type="text" id="addTeacherInput" placeholder="Neuen Lehrer hinzufügen" />
-<button type="submit">Hinzufügen</button>
-</form>
-</div>
+<!-- Removed .whitelist-management section -->
+
+    <div class="user-management">
+        <h3>Benutzer-Verwaltung (Genehmigung)</h3>
+        <p>Aktiviere Lehrer, damit sie Termine buchen können.</p>
+        <ul id="userList"></ul>
+    </div>
 </section>
 
     <!-- Custom Modal for alerts and confirmations -->
@@ -433,7 +431,7 @@ font-size: 0.9rem;
     // Corrected Firebase imports for modular SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"; // Added reauthenticateWithCredential, EmailAuthProvider, deleteUser
-    import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot, query, where, addDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"; // Added writeBatch
+    import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot, query, where, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"; // Removed addDoc, since whitelist_teachers is removed
 
     // === Firebase-Konfiguration ===
     // Wichtiger Hinweis: Wenn Sie den Fehler "auth/configuration-not-found" erhalten,
@@ -453,16 +451,117 @@ font-size: 0.9rem;
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // === Firestore Security Rules (MUSS IN FIREBASE CONSOLE EINGEFÜGT WERDEN!) ===
+    // Gehen Sie zu Firebase Console -> Cloud Firestore -> Rules
+    // Ersetzen Sie die vorhandenen Regeln mit den folgenden.
+    // ERSETZEN SIE 'YOUR_SASCHA_BIRK_UID' DURCH DIE ECHTE UID VON SASCHA BIRK!
+    /*
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+
+        function isAdmin() {
+          // ERSETZEN SIE 'YOUR_SASCHA_Birk_UID' DURCH DIE ECHTE UID VON SASCHA BIRK!
+          // ERSETZEN SIE 'ADMIN_UID_2' DURCH DIE UID DES ZWEITEN ADMINS!
+          // ERSETZEN SIE 'ADMIN_UID_3' DURCH DIE UID DES DRITTEN ADMINS!
+          return request.auth.uid == 'YOUR_SASCHA_Birk_UID' || // Beispiel-UID: Bitte ersetzen!
+                 request.auth.uid == 'ADMIN_UID_2' ||
+                 request.auth.uid == 'ADMIN_UID_3';
+        }
+
+        function getUserData(userId) {
+          // Funktion zum Abrufen des Benutzerdokuments
+          return get(/databases/$(database)/documents/users/$(userId)).data;
+        }
+
+        function isApprovedUser() {
+          let user = getUserData(request.auth.uid);
+          // Ein Benutzer ist genehmigt, wenn sein Benutzerdokument existiert und das Feld 'isApproved' true ist.
+          return user != null && user.isApproved == true;
+        }
+
+        match /users/{userId} {
+          // Lesen: Jeder authentifizierte Benutzer kann Benutzerdokumente lesen.
+          allow read: if request.auth != null;
+
+          // Erstellen: Ein Benutzer kann sein eigenes Dokument bei der Registrierung erstellen.
+          // Es muss für seine eigene UID sein, und 'isApproved' muss initial false sein, da die Genehmigung manuell durch den Admin erfolgt.
+          allow create: if request.auth != null &&
+                            request.auth.uid == userId &&
+                            request.resource.data.isApproved == false;
+
+          // Aktualisieren:
+          // Ein Benutzer kann nur sein eigenes 'name'-Feld aktualisieren.
+          // Ein Admin (isAdmin) kann den 'isApproved'-Status jedes Benutzers aktualisieren.
+          allow update: if request.auth != null && (
+            (request.auth.uid == userId &&
+             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name'])) ||
+            (isAdmin() &&
+             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isApproved']))
+          );
+
+          // Löschen: Nur der Eigentümer des Dokuments oder ein Admin kann ein Benutzerdokument löschen.
+          allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
+        }
+
+        match /bookings/{date} {
+          // Lesen: Jeder authentifizierte Benutzer kann alle Buchungsdaten lesen.
+          allow read: if request.auth != null;
+
+          match /rooms/{roomName} {
+            // Lesen: Jeder authentifizierte Benutzer kann alle Buchungen für einen bestimmten Raum an einem bestimmten Datum lesen.
+            allow read: if request.auth != null;
+
+            // Schreiben (Erstellen/Aktualisieren/Löschen eines Zeitfensters im Dokument eines Raumes):
+            // Nur erlaubt, wenn:
+            // 1. Der Benutzer ein Admin ist.
+            // 2. ODER der Benutzer ein genehmigter Lehrer ist UND er eine gültige Buchungs-/Stornierungsaktion an SEINEM EIGENEN Zeitfenster durchführt.
+            //    Diese Regel prüft, dass nur EIN Feld (das Zeitfenster) im Dokument geändert wird,
+            //    und dass diese Änderung entweder das Setzen auf den Namen des Benutzers (leeres Zeitfenster buchen)
+            //    oder das Setzen auf null (eigenes Zeitfenster stornieren) ist.
+            //    --> KORRIGIERT: Verwendet jetzt den Namen aus dem Firestore-Benutzerdokument und macht den Vergleich mit toLowerCase().
+            allow write: if request.auth != null && (
+              isAdmin() ||
+              (
+                isApprovedUser() && // Nur genehmigte Benutzer können Buchungen schreiben (wenn sie kein Admin sind)
+                request.resource.data.diff(resource.data).changedKeys().size() == 1 && // Nur ein Feld (Zeitfenster) darf geändert werden
+                (
+                    // Da 'let' nicht erlaubt ist, müssen wir die Werte direkt referenzieren.
+                    // changedKey ist das einzige Element im Array changedKeys(), da size() == 1 geprüft wird.
+                    (
+                        request.resource.data[request.resource.data.diff(resource.data).changedKeys()[0]] is string &&
+                        request.resource.data[request.resource.data.diff(resource.data).changedKeys()[0]].toLowerCase() == getUserData(request.auth.uid).name.toLowerCase() &&
+                        (resource.data[request.resource.data.diff(resource.data).changedKeys()[0]] == null || !resource.data.keys().hasAny([request.resource.data.diff(resource.data).changedKeys()[0]]))
+                    )
+                    ||
+                    (
+                        request.resource.data[request.resource.data.diff(resource.data).changedKeys()[0]] == null &&
+                        resource.data.keys().hasAny([request.resource.data.diff(resource.data).changedKeys()[0]]) && // Prüfen, ob der alte Slot existiert
+                        resource.data[request.resource.data.diff(resource.data).changedKeys()[0]] is string &&
+                        resource.data[request.resource.data.diff(resource.data).changedKeys()[0]].toLowerCase() == getUserData(request.auth.uid).name.toLowerCase()
+                    )
+                )
+              )
+            );
+          }
+        }
+      }
+    }
+    */
+
     // === Globale Variablen ===
     let currentUser = null; // Stores authenticated user's display name
     let currentUserEmail = null; // Stores authenticated user's email
     let isAdmin = false;
+    let currentUserData = null; // NEW: Stores the full user document data from Firestore
     const DAYS_TO_SHOW = 30;
     let selectedDate = null;
     let selectedRoom = 'Raum 1';
 
-    // Hardcoded admin names for explicit admin rights
-    const ADMIN_NAMES = ["jeanin birk", "sascha birk"];
+    // Hardcoded admin names for explicit admin rights (for UI logic only)
+    // The actual admin check for security is done in Firestore Rules using UID.
+    // Make sure these names match the names of the UIDs you configure in Firestore Rules.
+    const ADMIN_NAMES = ["sascha birk", "jeanin birk", "nora"]; 
 
     // === Utility function to capitalize the first letter of each word ===
     function toTitleCase(str) {
@@ -518,71 +617,90 @@ font-size: 0.9rem;
     // === Firebase Auth State Listener ===
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // User is signed in.
             currentUserEmail = user.email;
 
-            // Retrieve display name from Firestore 'users' collection
             const userDocRef = doc(db, 'users', user.uid);
             const userDocSnap = await getDoc(userDocRef);
 
             if (userDocSnap.exists()) {
-                currentUser = userDocSnap.data().name;
+                currentUserData = userDocSnap.data(); // Store all user data including isApproved
+                currentUser = currentUserData.name;
+                // Check if current user's UID is one of the hardcoded admin UIDs (requires async check or pre-populated list)
+                // For client-side UI, we'll use the ADMIN_NAMES list for display purposes.
+                // The actual security is handled by Firestore Rules based on UID.
+                isAdmin = ADMIN_NAMES.includes(currentUser.toLowerCase()); 
             } else {
-                // If user document doesn't exist (e.g., deleted manually), sign out
                 console.warn("User document not found for authenticated user:", user.uid);
-                await signOut(auth); // Force sign out if user data is missing
+                await signOut(auth);
                 return;
             }
 
-            // Determine admin status based on hardcoded names
-            isAdmin = ADMIN_NAMES.includes(currentUser.toLowerCase());
-
-            localStorage.setItem('currentUserUid', user.uid); // Store UID for session persistence
+            localStorage.setItem('currentUserUid', user.uid);
             localStorage.setItem('currentUser', currentUser);
-            localStorage.setItem('isAdmin', isAdmin);
+            localStorage.setItem('isAdmin', isAdmin); // This is for UI, actual security by Firestore rules
+            localStorage.setItem('currentUserData', JSON.stringify(currentUserData)); // Store full data
 
             showDashboard();
-            await loadWhitelist(); // Reload whitelist after user is authenticated
-            renderWhitelist();
+
+            // Listen for real-time updates to the user's own document (especially isApproved)
+            onSnapshot(userDocRef, (doc) => {
+                if (doc.exists()) {
+                    const prevIsApproved = currentUserData.isApproved;
+                    currentUserData = doc.data();
+                    isAdmin = ADMIN_NAMES.includes(currentUserData.name.toLowerCase()); // Re-evaluate admin for UI
+
+                    // If approval status changed, refresh UI for user
+                    if (prevIsApproved !== currentUserData.isApproved) {
+                        showModal(`Dein Genehmigungsstatus wurde ${currentUserData.isApproved ? 'aktiviert' : 'deaktiviert'}.`).then(() => {
+                            if (selectedDate) {
+                                selectDate(selectedDate); // Re-render time slots if approval status changes
+                            }
+                            updateUserApprovalStatusDisplay(); // Update display for current user
+                        });
+                    } else if (selectedDate) {
+                        // If selectedDate is already set and other data changed (e.g., name), re-render
+                        selectDate(selectedDate);
+                    }
+                    updateUserApprovalStatusDisplay(); // Always update display when user data loads/changes
+                }
+            });
+
         } else {
-            // User is signed out.
             currentUser = null;
             currentUserEmail = null;
             isAdmin = false;
+            currentUserData = null; // Clear user data
             localStorage.removeItem('currentUserUid');
             localStorage.removeItem('currentUser');
             localStorage.removeItem('isAdmin');
+            localStorage.removeItem('currentUserData');
             showLogin();
         }
     });
 
-    // Whitelist aus Firestore laden (now loads from 'whitelist_teachers' collection)
-    async function loadWhitelist() {
-        const teachersCollectionRef = collection(db, 'whitelist_teachers');
-        const teachersSnapshot = await getDocs(teachersCollectionRef);
-        whitelist.teachers = teachersSnapshot.docs.map(doc => ({ name: doc.data().name, uid: doc.data().uid })); // Store UID with name
-    }
+    // Helper to update the approval status display in the dashboard
+    const userApprovalStatusDisplay = document.getElementById('userApprovalStatus');
+    function updateUserApprovalStatusDisplay() {
+        // Only show approval status if not an admin
+        if (isAdmin) {
+            userApprovalStatusDisplay.textContent = "";
+            return;
+        }
 
-    // Whitelist speichern (for teachers only)
-    async function saveWhitelist(type, list) {
-        if (type === 'teachers') {
-            const teachersCollectionRef = collection(db, 'whitelist_teachers');
-            const batch = writeBatch(db);
-
-            // Fetch current documents to find and delete
-            const currentTeachersSnapshot = await getDocs(teachersCollectionRef);
-            currentTeachersSnapshot.forEach(docSnap => {
-                batch.delete(docSnap.ref);
-            });
-
-            // Add updated list
-            for (const teacher of list) {
-                // Ensure name and uid are consistent if coming from object list
-                batch.set(doc(teachersCollectionRef), { name: teacher.name || teacher, uid: teacher.uid || null }); // Handles both string and object input
+        if (currentUserData) {
+            if (currentUserData.isApproved) {
+                userApprovalStatusDisplay.textContent = "(Genehmigt)";
+                userApprovalStatusDisplay.style.color = "#2e7d32"; // Green
+            } else {
+                userApprovalStatusDisplay.textContent = "(Warten auf Genehmigung)";
+                userApprovalStatusDisplay.style.color = "#d32f2f"; // Red
             }
-            await batch.commit();
+        } else {
+            userApprovalStatusDisplay.textContent = "";
         }
     }
+
+    // Removed loadWhitelist and saveWhitelist as 'whitelist_teachers' collection is deprecated for core logic.
 
     // Lade Buchungen für Datum und Raum (Firestore)
     async function loadBookings(dateStr, room) {
@@ -593,31 +711,33 @@ font-size: 0.9rem;
 
     // Buchung speichern / löschen (Firestore)
     async function toggleBooking(dateStr, room, timeSlot, userDisplayName, isAdminUser) {
+        // Client-side check before attempting write, for better UX
+        if (!currentUserData || (!currentUserData.isApproved && !isAdminUser)) {
+            await showModal("Du bist noch nicht genehmigt, um Termine zu buchen. Bitte kontaktiere den Administrator.");
+            return;
+        }
+
         const bookingDocRef = doc(db, 'bookings', dateStr, 'rooms', room);
         const currentBookings = await loadBookings(dateStr, room);
 
         if (currentBookings[timeSlot] && currentBookings[timeSlot].toLowerCase() === userDisplayName.toLowerCase()) {
-            // User's own booking, remove it
+            // User's own booking, remove it - NO CONFIRMATION
             delete currentBookings[timeSlot];
             await setDoc(bookingDocRef, currentBookings);
             return null;
         } else if (currentBookings[timeSlot] && isAdminUser) {
-            // Admin deleting another user's slot
-            const confirmed = await showModal(`Möchtest du den Termin von ${toTitleCase(currentBookings[timeSlot])} wirklich löschen?`, 'confirm');
-            if (confirmed) {
-                delete currentBookings[timeSlot];
-                await setDoc(bookingDocRef, currentBookings);
-                return null;
-            } else {
-                return currentBookings[timeSlot]; // Admin cancelled
-            }
+            // Admin deleting another user's slot - NO CONFIRMATION
+            delete currentBookings[timeSlot];
+            await setDoc(bookingDocRef, currentBookings);
+            return null;
         } else if (!currentBookings[timeSlot]) {
-            // Slot is free, book it
-            currentBookings[timeSlot] = userDisplayName;
+            // Slot is free, book it - NO CONFIRMATION
+            currentBookings[timeSlot] = userDisplayName; // Store name as it comes (now consistently lowercase from registration)
             await setDoc(bookingDocRef, currentBookings);
             return userDisplayName;
         } else {
             // Slot is booked by someone else (and not admin trying to delete)
+            await showModal(`Dieser Termin ist bereits von ${toTitleCase(currentBookings[timeSlot])} gebucht!`);
             return currentBookings[timeSlot];
         }
     }
@@ -734,14 +854,11 @@ font-size: 0.9rem;
     const deleteAccountBtn = document.getElementById('deleteAccountBtn'); // NEW: Delete account button
 
     const clearAllBookingsBtn = document.getElementById('clearAllBookingsBtn');
-    const teacherList = document.getElementById('teacherList');
-    const addTeacherForm = document.getElementById('addTeacherForm');
-    const addTeacherInput = document.getElementById('addTeacherInput');
+    // Removed elements related to whitelist-management
 
+    const userList = document.getElementById('userList'); // NEW: For user approval management
     const room1Radio = document.getElementById('room1');
     const room2Radio = document.getElementById('room2');
-
-    let whitelist = { teachers: [], admins: [] }; // Admins list will not be managed via UI now
 
     let bookingsForSelectedDate = {};
 
@@ -820,20 +937,18 @@ font-size: 0.9rem;
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Save user's name to Firestore 'users' collection
+            // Save user's name to Firestore 'users' collection with isApproved: false
+            // Store name in lowercase to ensure consistent comparison with rules
             await setDoc(doc(db, 'users', user.uid), {
-                name: name,
+                name: name.toLowerCase(), // Store name in lowercase
                 email: email,
                 uid: user.uid,
-                isTeacher: true // All registered users are teachers by default
+                isTeacher: true, // All registered users are teachers by default
+                isApproved: false // NEW: User is unapproved by default
             });
 
-            // Add user's name and UID to the 'whitelist_teachers' collection
-            const teachersCollectionRef = collection(db, 'whitelist_teachers');
-            await addDoc(teachersCollectionRef, { name: name, uid: user.uid });
-
-            await showModal("Registrierung erfolgreich! Sie sind jetzt angemeldet.", 'alert');
-            // onAuthStateChanged will handle UI update and dashboard display
+            await showModal("Registrierung erfolgreich! Sie sind jetzt angemeldet. Bitte warten Sie auf die Genehmigung durch einen Administrator, um Termine buchen zu können.", 'alert');
+            // onAuthStateChanged will handle UI update
         } catch (error) {
             console.error("Registration Error:", error.code, error.message);
             let errorMessage = "Registrierung fehlgeschlagen.";
@@ -843,6 +958,8 @@ font-size: 0.9rem;
                 errorMessage = "Ungültiges E-Mail-Format.";
             } else if (error.code === 'auth/weak-password') {
                 errorMessage = "Passwort ist zu schwach (min. 6 Zeichen).";
+            } else if (error.code === 'auth/configuration-not-found') {
+                errorMessage = "Registrierung fehlgeschlagen. Bitte aktivieren Sie die 'Email/Password'-Anmeldemethode in Ihrer Firebase Console unter 'Authentication' -> 'Sign-in method'.";
             }
             registerError.textContent = errorMessage;
             registerError.style.display = 'block';
@@ -895,13 +1012,7 @@ font-size: 0.9rem;
             // 1. Delete user's document from 'users' collection
             await deleteDoc(doc(db, 'users', userUid));
 
-            // 2. Remove user from 'whitelist_teachers' collection
-            const teachersCollectionRef = collection(db, 'whitelist_teachers');
-            const q = query(teachersCollectionRef, where('name', '==', userDisplayName));
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach(async (d) => {
-                await deleteDoc(d.ref);
-            });
+            // 2. Removed logic to remove user from 'whitelist_teachers' collection as it's deprecated.
 
             // 3. Clear all bookings made by this user
             await clearUserBookings(userDisplayName);
@@ -935,10 +1046,14 @@ font-size: 0.9rem;
         dashboardSection.style.display = 'block';
         adminSection.style.display = isAdmin ? 'block' : 'none';
         userNameDisplay.textContent = toTitleCase(currentUser);
+        updateUserApprovalStatusDisplay(); // Update approval status on dashboard load
 
         renderDates();
         if (selectedDate) {
             selectDate(selectedDate);
+        }
+        if (isAdmin) {
+            renderUserList(); // Call to render the list of users in admin panel
         }
     }
 
@@ -1010,7 +1125,7 @@ font-size: 0.9rem;
     // Zeit-Slots rendern
     function renderTimeSlots() {
         timeSlotsContainer.innerHTML = '';
-        timeSlotsContainer.style.display = 'flex';
+        timeSlotsContainer.style.display = 'grid'; // Ensure grid display for consistency
 
         const slots = generateTimeSlots();
 
@@ -1024,144 +1139,119 @@ font-size: 0.9rem;
                 if (currentUser && bookingUser.toLowerCase() === currentUser.toLowerCase()) {
                     slotDiv.classList.add('own');
                     slotDiv.title = 'Klicke zum Austragen';
-                } else if (isAdmin) {
+                } else if (isAdmin) { // Admin can override
                     slotDiv.classList.add('booked', 'admin-override');
                     slotDiv.title = `Gebucht von ${toTitleCase(bookingUser)} (Klicke zum Löschen)`;
-                } else {
+                } else { // Booked by someone else, not admin
                     slotDiv.classList.add('booked');
                     slotDiv.title = 'Bereits gebucht';
                 }
             } else {
                 slotDiv.textContent = slot;
-                slotDiv.title = 'Klicke zum Eintragen';
+                // Only allow click if approved or admin
+                if (currentUserData && currentUserData.isApproved || isAdmin) {
+                    slotDiv.title = 'Klicke zum Eintragen';
+                } else {
+                    slotDiv.title = 'Nicht genehmigt (zum Buchen Administrator kontaktieren)';
+                    slotDiv.style.cursor = 'not-allowed'; // Visually indicate not clickable
+                    slotDiv.classList.add('booked'); // Grey out slightly if not approved
+                }
             }
 
-            if (!bookingUser || (currentUser && bookingUser.toLowerCase() === currentUser.toLowerCase()) || isAdmin) {
+            // Only make clickable if appropriate permissions
+            if (currentUserData && (currentUserData.isApproved || isAdmin) && (!bookingUser || bookingUser.toLowerCase() === currentUser.toLowerCase() || isAdmin)) {
                 slotDiv.style.cursor = 'pointer';
                 slotDiv.onclick = async () => {
-                    if (!currentUser) {
+                    if (!currentUser) { // Should not happen with onAuthStateChanged but as a fallback
                         await showModal("Bitte logge dich zuerst ein, um einen Slot zu buchen.");
                         return;
                     }
-                    const result = await toggleBooking(selectedDate, selectedRoom, slot, currentUser, isAdmin);
-                    if (result === null) {
-                        delete bookingsForSelectedDate[slot];
-                    } else if (result === currentUser) {
-                        bookingsForSelectedDate[slot] = currentUser;
-                    } else {
-                        await showModal(`Slot bereits von ${toTitleCase(result)} gebucht!`);
-                        return;
-                    }
+                    // The toggleBooking function itself now has the approval check
+                    await toggleBooking(selectedDate, selectedRoom, slot, currentUser, isAdmin);
+                    // Re-fetch and re-render time slots after any action
+                    bookingsForSelectedDate = await loadBookings(selectedDate, selectedRoom);
                     renderTimeSlots();
                 };
+            } else if (!currentUserData || (!currentUserData.isApproved && !isAdmin)) {
+                slotDiv.onclick = () => showModal("Du bist noch nicht genehmigt, um Termine zu buchen. Bitte kontaktiere den Administrator.");
             }
 
             timeSlotsContainer.appendChild(slotDiv);
         });
     }
 
-    // Whitelist rendern (only teachers)
-    function renderWhitelist() {
-        teacherList.innerHTML = '';
-        whitelist.teachers.forEach(teacher => { // Iterate over teacher objects now
-            const li = document.createElement('li');
-            li.textContent = toTitleCase(teacher.name);
-            const btn = document.createElement('button');
-            btn.textContent = 'Löschen';
-            btn.className = 'remove-btn';
-            btn.onclick = async () => {
-                // Prevent admin from deleting other admin accounts
-                if (ADMIN_NAMES.includes(teacher.name.toLowerCase())) {
-                    await showModal("Admins können keine anderen Admin-Konten löschen.");
-                    return;
-                }
+    // Removed renderWhitelist function entirely, as it's no longer used.
 
-                const confirmed = await showModal(`"${toTitleCase(teacher.name)}" wirklich aus der Lehrer-Whitelist löschen und zugehörige Buchungen entfernen?`, 'confirm');
-                if (confirmed) {
-                    try {
-                        // 1. Remove from 'whitelist_teachers' collection
-                        const teachersCollectionRef = collection(db, 'whitelist_teachers');
-                        const q = query(teachersCollectionRef, where('uid', '==', teacher.uid)); // Use UID for precise deletion
-                        const querySnapshot = await getDocs(q);
-                        querySnapshot.forEach(async (d) => {
-                            await deleteDoc(d.ref);
-                        });
-
-                        // 2. Delete user's document from 'users' collection (if it exists)
-                        if (teacher.uid) { // Ensure UID exists
-                            await deleteDoc(doc(db, 'users', teacher.uid));
-                        }
-
-                        // 3. Clear all bookings made by this teacher
-                        await clearUserBookings(teacher.name); // Clear bookings by name (since bookings store name)
-
-                        // 4. (Optional - Requires Admin SDK on server): Attempt to delete Firebase Auth user.
-                        //    This part cannot be done directly from the client for another user.
-                        //    You would need a Firebase Cloud Function or a separate backend server
-                        //    using the Firebase Admin SDK to perform auth.deleteUser(uid).
-                        console.log(`NOTE: Firebase Auth account for ${teacher.name} (UID: ${teacher.uid}) could not be deleted directly from client-side. Requires Admin SDK.`);
-                        await showModal(`Lehrer "${toTitleCase(teacher.name)}" wurde von der Whitelist und seine Buchungen gelöscht. Das Auth-Konto muss ggf. manuell gelöscht werden.`, 'alert');
-
-
-                        await loadWhitelist(); // Reload whitelist to update UI
-                        renderWhitelist();
-                        if (selectedDate) { // Refresh current view if necessary
-                            bookingsForSelectedDate = await loadBookings(selectedDate, selectedRoom);
-                            renderTimeSlots();
-                        }
-                    } catch (error) {
-                        console.error("Error deleting teacher:", error);
-                        await showModal("Fehler beim Löschen des Lehrers.");
-                    }
-                }
-            };
-            li.appendChild(btn);
-            teacherList.appendChild(li);
-        });
-    }
-
-    // Neuen Lehrer hinzufügen (via Admin Panel)
-    addTeacherForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const name = addTeacherInput.value.trim();
-        if (!name) return;
-
-        // Check for duplicates (case insensitive)
-        const teachersCollectionRef = collection(db, 'whitelist_teachers');
-        const q = query(teachersCollectionRef, where('name', '==', name));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            await showModal("Lehrer bereits auf der Whitelist!");
-            return;
-        }
-
-        // Admins cannot directly add other admins via this panel
-        if (ADMIN_NAMES.includes(name.toLowerCase())) {
-            await showModal("Admin-Konten können nicht über dieses Panel hinzugefügt werden.");
-            addTeacherInput.value = '';
-            return;
-        }
-
-        try {
-            // Note: This only adds to whitelist_teachers, not Firebase Auth.
-            // A proper registration for teachers should go through the register form.
-            // If adding here, the user won't have an Auth account unless manually created.
-            await addDoc(teachersCollectionRef, { name: name, uid: null }); // UID is null for manually added teachers
-            await showModal(`Lehrer "${toTitleCase(name)}" zur Whitelist hinzugefügt. (Hinweis: Für vollen Zugriff muss sich der Lehrer ggf. registrieren.)`);
-            addTeacherInput.value = '';
-            await loadWhitelist(); // Reload whitelist to update UI
-            renderWhitelist();
-        } catch (error) {
-            console.error("Error adding teacher:", error);
-            await showModal("Fehler beim Hinzufügen des Lehrers.");
-        }
-    };
+    // Removed addTeacherForm.onsubmit logic, as it's no longer used.
 
     // Admin Button: Alle Buchungen löschen
     clearAllBookingsBtn.onclick = async () => {
         await clearAllBookings();
     };
+
+    // NEW: Function to render all users (for admin panel approval)
+    async function renderUserList() {
+        if (!isAdmin) { // Only admins can see this section
+            userList.innerHTML = '';
+            return;
+        }
+        userList.innerHTML = '<li>Lade Benutzer...</li>';
+        const usersCollectionRef = collection(db, 'users');
+        const usersSnapshot = await getDocs(usersCollectionRef);
+
+        userList.innerHTML = '';
+        if (usersSnapshot.empty) {
+            userList.innerHTML = '<li>Keine Benutzer gefunden.</li>';
+            return;
+        }
+
+        usersSnapshot.forEach(userDoc => {
+            const userData = userDoc.data();
+            // Don't show the currently logged-in admin in this list for approval
+            if (userData.uid === auth.currentUser.uid) return; 
+
+            const li = document.createElement('li');
+            li.style.display = 'flex';
+            li.style.justifyContent = 'space-between';
+            li.style.alignItems = 'center';
+            li.style.padding = '8px 10px';
+            li.style.margin = '5px 0';
+            li.style.backgroundColor = '#f0f0f0';
+            li.style.borderRadius = '8px';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = toTitleCase(userData.name);
+            li.appendChild(nameSpan);
+
+            const statusSpan = document.createElement('span');
+            statusSpan.textContent = userData.isApproved ? 'Aktiviert' : 'Deaktiviert';
+            statusSpan.style.color = userData.isApproved ? '#2e7d32' : '#d32f2f';
+            statusSpan.style.fontWeight = 'bold';
+            li.appendChild(statusSpan);
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.textContent = userData.isApproved ? 'Deaktivieren' : 'Aktivieren';
+            toggleBtn.style.marginLeft = '10px';
+            toggleBtn.style.backgroundColor = userData.isApproved ? '#ef5350' : '#4caf50'; // Red for deactivate, green for activate
+            toggleBtn.onclick = async () => {
+                const confirmed = await showModal(`Möchtest du "${toTitleCase(userData.name)}" ${userData.isApproved ? 'deaktivieren' : 'aktivieren'}?`, 'confirm');
+                if (confirmed) {
+                    try {
+                        // Admin updates isApproved status of another user
+                        await setDoc(doc(db, 'users', userDoc.id), { isApproved: !userData.isApproved }, { merge: true });
+                        await showModal(`${toTitleCase(userData.name)} wurde ${userData.isApproved ? 'deaktiviert' : 'aktiviert'}.`);
+                        renderUserList(); // Re-render list
+                    } catch (error) {
+                        console.error("Error toggling user approval:", error);
+                        await showModal("Fehler beim Ändern des Status: " + error.message);
+                    }
+                }
+            };
+            li.appendChild(toggleBtn);
+
+            userList.appendChild(li);
+        });
+    }
 
     // Event listeners for room selection
     room1Radio.addEventListener('change', () => {
@@ -1182,3 +1272,4 @@ font-size: 0.9rem;
 </script>
 </body>
 </html>
+
