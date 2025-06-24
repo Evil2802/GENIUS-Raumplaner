@@ -2,298 +2,401 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Raumplaner mit Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raumplanung Nachhilfe</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      color: #fff;
-      margin: 0; padding: 0;
+      background-color: #eef2f7;
+      padding: 20px;
+      margin: 0;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
     }
-    .container {
-      background: #fff;
-      color: #333;
-      border-radius: 12px;
-      padding: 30px 40px;
-      max-width: 600px;
+    .login, .dashboard {
+      max-width: 900px;
       width: 100%;
-      box-shadow: 0 0 25px rgba(0,0,0,0.2);
-      text-align: center;
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
     }
     h2 {
-      margin-bottom: 15px;
-      color: #2575fc;
+      margin-top: 0;
+      color: #2c3e50;
+      font-weight: 700;
     }
     input[type="text"] {
-      width: 80%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1.5px solid #2575fc;
+      width: 100%;
+      padding: 12px 10px;
       font-size: 1rem;
-      margin-bottom: 12px;
-      outline: none;
-      transition: border-color 0.3s ease;
+      border: 2px solid #2980b9;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
     }
     input[type="text"]:focus {
-      border-color: #6a11cb;
+      outline: none;
+      border-color: #1abc9c;
+      box-shadow: 0 0 5px #1abc9c;
     }
     button {
-      background: #6a11cb;
-      border: none;
-      color: white;
-      padding: 12px 25px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
+      padding: 10px 20px;
       font-size: 1rem;
-      transition: background 0.3s ease;
-      user-select: none;
-    }
-    button:hover {
-      background: #2575fc;
-    }
-    #dashboard {
-      display: none;
-      text-align: left;
-      margin-top: 20px;
-    }
-    #userDisplay {
-      font-weight: 700;
-      color: #2575fc;
-    }
-    .calendar-grid {
-      margin-top: 15px;
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-    }
-    .day {
-      background: #e0e7ff;
-      color: #333;
-      padding: 10px 5px;
+      font-weight: 600;
+      background-color: #2980b9;
+      color: white;
+      border: none;
       border-radius: 8px;
       cursor: pointer;
-      user-select: none;
-      transition: background 0.25s ease;
+      transition: background-color 0.3s;
+    }
+    button:hover:not(:disabled) {
+      background-color: #1abc9c;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: default;
+    }
+    .error {
+      color: #e74c3c;
       font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    /* Kalender Styles */
+    #monthContainer {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .dayCard {
+      background: #f7f9fc;
+      border-radius: 10px;
+      width: 110px;
+      padding: 12px 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.15s;
+      user-select: none;
+    }
+    .dayCard:hover {
+      background-color: #d0f0e4;
+      transform: translateY(-3px);
+    }
+    .dayCard.selected {
+      background-color: #1abc9c;
+      color: white;
+      font-weight: 700;
+      transform: translateY(-5px);
+      box-shadow: 0 5px 12px rgba(26,188,156,0.5);
+    }
+    .dayLabel {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #34495e;
+      margin-bottom: 6px;
       text-align: center;
     }
-    .day:hover {
-      background: #a5b4fc;
-      color: #1e40af;
-    }
-    .selected-day {
-      background: #4338ca !important;
-      color: white !important;
+    .dateLabel {
+      font-size: 1.3rem;
       font-weight: 700;
-      box-shadow: 0 0 8px #4338ca;
+      text-align: center;
+      user-select: none;
     }
-    .timeslots {
-      margin-top: 20px;
-    }
-    .slot-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      background: #f3f4f6;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      color: #111827;
-    }
-    .slot-row span {
-      flex: 1;
-    }
-    .slot-row button {
-      background: #4338ca;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .slot-row button:hover {
-      background: #3730a3;
-    }
-    .slot-row .booked-by-other {
-      color: #6b7280;
-      font-style: italic;
-    }
-    #errorMsg {
-      color: red;
-      font-weight: 600;
-      margin-bottom: 12px;
+
+    /* Zeitfenster */
+    #timeSlotsContainer {
+      margin-top: 25px;
+      max-width: 900px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px 25px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
       display: none;
+    }
+    .timeSlot {
+      border: 1.5px solid #2980b9;
+      border-radius: 8px;
+      margin: 5px;
+      padding: 12px 8px;
+      cursor: pointer;
+      user-select: none;
+      display: inline-block;
+      width: 120px;
+      text-align: center;
+      font-weight: 600;
+      color: #2980b9;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .timeSlot.booked {
+      background-color: #e74c3c;
+      color: white;
+      cursor: default;
+      border-color: #c0392b;
+    }
+    .timeSlot.bookedByUser {
+      background-color: #27ae60;
+      color: white;
+      border-color: #1e8449;
+    }
+    .timeSlot:hover:not(.booked) {
+      background-color: #1abc9c;
+      color: white;
+      border-color: #16a085;
+    }
+    #selectedDateTitle {
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: #2c3e50;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Raumplaner Nachhilfe — Login</h2>
 
-    <div id="loginBox">
-      <p>Bitte gib deinen Namen ein:</p>
-      <input type="text" id="usernameInput" placeholder="z.B. Anna Müller" />
-      <div id="errorMsg">Bitte gib einen Namen ein.</div>
-      <button id="loginBtn">Anmelden</button>
-    </div>
+<div class="login" id="loginBox">
+  <h2>Login</h2>
+  <p>Gib deinen Namen ein (nur erlaubte Personen):</p>
+  <input type="text" id="username" placeholder="z. B. Anna Müller" autocomplete="off" />
+  <div class="error" id="loginError" style="display:none;"></div>
+  <button id="loginBtn">Einloggen</button>
+</div>
 
-    <div id="dashboard">
-      <p>Angemeldet als: <span id="userDisplay"></span></p>
+<div class="dashboard" id="dashboard" style="display:none">
+  <h2>Willkommen, <span id="userDisplay"></span></h2>
+  <p>Wähle ein Datum unten aus und trage dich für 30 Minuten Zeitfenster in Raum A oder B ein.</p>
 
-      <h3>Wähle ein Datum:</h3>
-      <div class="calendar-grid" id="calendarDays"></div>
+  <div id="monthContainer"></div>
 
-      <div class="timeslots" id="timeslots"></div>
-    </div>
+  <div id="timeSlotsContainer">
+    <div id="selectedDateTitle"></div>
+    <div><strong>Raum A</strong></div>
+    <div id="timeSlotsA"></div>
+    <br>
+    <div><strong>Raum B</strong></div>
+    <div id="timeSlotsB"></div>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
-      authDomain: "genius-raumplaner.firebaseapp.com",
-      projectId: "genius-raumplaner",
-      storageBucket: "genius-raumplaner.appspot.com",
-      messagingSenderId: "1081346940014",
-      appId: "1:1081346940014:web:d6b00e0f7d3cd1fb125a7f",
-      databaseURL: "https://genius-raumplaner-default-rtdb.europe-west1.firebasedatabase.app/"
-    };
+<script>
+  // Firebase-Konfiguration hier einsetzen (deine Daten)
+  const firebaseConfig = {
+    apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
+    authDomain: "genius-raumplaner.firebaseapp.com",
+    databaseURL: "https://genius-raumplaner-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "genius-raumplaner",
+    storageBucket: "genius-raumplaner.appspot.com",
+    messagingSenderId: "1081346940014",
+    appId: "1:1081346940014:web:d6b00e0f7d3cd1fb125a7f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  // Zulässige Namen (Whitelist), Kleinschreibung ignorieren
+  const allowedUsers = ["anna müller", "max mustermann", "lara schmidt"];
 
-    let aktuellerUser = "";
-    let ausgewähltesDatum = "";
+  let aktuellerUser = "";
+  let selectedDate = null;
+  let bookings = {}; // alle Buchungen aus DB
 
-    // 30-Minuten-Zeitslots von 6:00 bis 20:00
-    const zeiten = Array.from({ length: 28 }, (_, i) => {
-      const h = 6 + Math.floor(i / 2);
-      const m = i % 2 === 0 ? "00" : "30";
-      const start = `${String(h).padStart(2, '0')}:${m}`;
-      const endH = m === "00" ? h : h + 1;
-      const endM = m === "00" ? "30" : "00";
-      const end = `${String(endH).padStart(2, '0')}:${endM}`;
-      return `${start}-${end}`;
-    });
+  // Hilfsfunktion: Zeitfenster von 6:00 bis 20:00 in 30 Min Schritten
+  function generateTimeSlots(startHour = 6, endHour = 20) {
+    const slots = [];
+    for (let h = startHour; h < endHour; h++) {
+      slots.push(`${String(h).padStart(2, "0")}:00-${String(h).padStart(2, "0")}:30`);
+      slots.push(`${String(h).padStart(2, "0")}:30-${String(h+1).padStart(2, "0")}:00`);
+    }
+    return slots;
+  }
 
-    // 30 Tage ab heute als Kalender anzeigen mit Wochentagen
-    const tage = Array.from({ length: 30 }, (_, i) => {
+  const timeSlots = generateTimeSlots();
+
+  // Erstelle 30 Tage ab heute als Datum-Strings + Wochentage
+  function getDaysArray() {
+    const days = [];
+    const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    for(let i=0; i<30; i++) {
       const d = new Date();
       d.setDate(d.getDate() + i);
-      const day = d.toLocaleDateString("de-DE", { weekday: 'short' });
-      const iso = d.toISOString().split('T')[0];
-      return { label: `${day} ${iso}`, key: iso };
+      const dateStr = d.toISOString().split('T')[0];
+      days.push({
+        date: dateStr,
+        dayName: dayNames[d.getDay()],
+        dayNum: d.getDate()
+      });
+    }
+    return days;
+  }
+
+  // UI-Elemente
+  const loginBox = document.getElementById('loginBox');
+  const dashboard = document.getElementById('dashboard');
+  const userDisplay = document.getElementById('userDisplay');
+  const monthContainer = document.getElementById('monthContainer');
+  const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+  const selectedDateTitle = document.getElementById('selectedDateTitle');
+  const timeSlotsA = document.getElementById('timeSlotsA');
+  const timeSlotsB = document.getElementById('timeSlotsB');
+  const loginError = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+  const usernameInput = document.getElementById('username');
+
+  // Login Event
+  loginBtn.addEventListener('click', () => {
+    const enteredName = usernameInput.value.trim();
+    if (!enteredName) {
+      showError("Bitte gib deinen Namen ein.");
+      return;
+    }
+    if (!allowedUsers.includes(enteredName.toLowerCase())) {
+      showError("Dein Name ist nicht in der Liste der erlaubten Nutzer.");
+      return;
+    }
+    aktuellerUser = enteredName;
+    loginBox.style.display = "none";
+    dashboard.style.display = "block";
+    userDisplay.textContent = aktuellerUser;
+    loginError.style.display = "none";
+    loadBookings();
+    renderCalendar();
+  });
+
+  function showError(msg) {
+    loginError.style.display = "block";
+    loginError.textContent = msg;
+  }
+
+  // Kalender rendern
+  function renderCalendar() {
+    monthContainer.innerHTML = "";
+    const days = getDaysArray();
+    days.forEach(day => {
+      const card = document.createElement('div');
+      card.classList.add('dayCard');
+      card.dataset.date = day.date;
+      card.innerHTML = `
+        <div class="dayLabel">${day.dayName}</div>
+        <div class="dateLabel">${day.dayNum}</div>
+      `;
+      card.addEventListener('click', () => {
+        selectDate(day.date);
+      });
+      monthContainer.appendChild(card);
+    });
+  }
+
+  // Datum auswählen
+  function selectDate(date) {
+    selectedDate = date;
+    selectedDateTitle.textContent = `Gebuchte Zeiten am ${selectedDate}`;
+    timeSlotsContainer.style.display = "block";
+
+    // Markiere ausgewählten Tag
+    document.querySelectorAll('.dayCard').forEach(card => {
+      card.classList.toggle('selected', card.dataset.date === date);
     });
 
-    const loginBtn = document.getElementById("loginBtn");
-    const usernameInput = document.getElementById("usernameInput");
-    const errorMsg = document.getElementById("errorMsg");
+    renderTimeSlots();
+  }
 
-    loginBtn.onclick = () => {
-      const name = usernameInput.value.trim();
-      if (!name) {
-        errorMsg.style.display = "block";
-        return;
-      }
-      errorMsg.style.display = "none";
-      aktuellerUser = name;
-      document.getElementById("userDisplay").textContent = aktuellerUser;
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("dashboard").style.display = "block";
-      renderKalender();
-    };
+  // Lade alle Buchungen aus Firebase
+  function loadBookings() {
+    db.ref('bookings').on('value', (snapshot) => {
+      bookings = snapshot.val() || {};
+      if(selectedDate) renderTimeSlots();
+    });
+  }
 
-    function renderKalender() {
-      const grid = document.getElementById("calendarDays");
-      grid.innerHTML = "";
-      tage.forEach(d => {
-        const el = document.createElement("div");
-        el.className = "day";
-        el.textContent = d.label;
-        el.onclick = () => {
-          ausgewähltesDatum = d.key;
-          // Markierung setzen
-          [...grid.children].forEach(c => c.classList.remove("selected-day"));
-          el.classList.add("selected-day");
-          ladeZeiten(d.key);
-        };
-        grid.appendChild(el);
-      });
-    }
+  // Zeitfenster anzeigen mit Buchungsstatus
+  function renderTimeSlots() {
+    timeSlotsA.innerHTML = "";
+    timeSlotsB.innerHTML = "";
 
-    async function ladeZeiten(tag) {
-      const tsDiv = document.getElementById("timeslots");
-      tsDiv.innerHTML = `<h3>${tag} – Belegung</h3>`;
-      const snapshot = await get(ref(db, "buchungen/" + tag));
-      const data = snapshot.exists() ? snapshot.val() : {};
-      zeiten.forEach(zeit => {
-        const belegung = data[zeit] || { A: "", B: "" };
-        const zeile = document.createElement("div");
-        zeile.className = "slot-row";
-
-        const info = document.createElement("span");
-        info.textContent = zeit;
-
-        const raumA = document.createElement("span");
-        if (!belegung.A) {
-          raumA.innerHTML = `<button onclick="eintragen('${tag}','${zeit}','A')">Raum A buchen</button>`;
-        } else if (belegung.A === aktuellerUser) {
-          raumA.innerHTML = `${belegung.A} <button onclick="austragen('${tag}','${zeit}','A')">Austragen</button>`;
+    timeSlots.forEach(slot => {
+      // Raum A
+      const bookedByA = bookings[selectedDate]?.[slot]?.A || "";
+      const slotA = document.createElement('div');
+      slotA.className = "timeSlot";
+      if(bookedByA) {
+        if(bookedByA.toLowerCase() === aktuellerUser.toLowerCase()) {
+          slotA.classList.add('bookedByUser');
+          slotA.textContent = `${slot} (Du) - Raum A`;
+          slotA.title = "Klicke zum Austragen";
+          slotA.addEventListener('click', () => {
+            austragen(selectedDate, slot, 'A');
+          });
         } else {
-          raumA.textContent = belegung.A;
-          raumA.classList.add("booked-by-other");
+          slotA.classList.add('booked');
+          slotA.textContent = `${slot} (Belegt) - Raum A`;
         }
+      } else {
+        slotA.textContent = `${slot} - Raum A`;
+        slotA.title = "Klicke zum Eintragen";
+        slotA.addEventListener('click', () => {
+          eintragen(selectedDate, slot, 'A');
+        });
+      }
+      timeSlotsA.appendChild(slotA);
 
-        const raumB = document.createElement("span");
-        if (!belegung.B) {
-          raumB.innerHTML = `<button onclick="eintragen('${tag}','${zeit}','B')">Raum B buchen</button>`;
-        } else if (belegung.B === aktuellerUser) {
-          raumB.innerHTML = `${belegung.B} <button onclick="austragen('${tag}','${zeit}','B')">Austragen</button>`;
+      // Raum B
+      const bookedByB = bookings[selectedDate]?.[slot]?.B || "";
+      const slotB = document.createElement('div');
+      slotB.className = "timeSlot";
+      if(bookedByB) {
+        if(bookedByB.toLowerCase() === aktuellerUser.toLowerCase()) {
+          slotB.classList.add('bookedByUser');
+          slotB.textContent = `${slot} (Du) - Raum B`;
+          slotB.title = "Klicke zum Austragen";
+          slotB.addEventListener('click', () => {
+            austragen(selectedDate, slot, 'B');
+          });
         } else {
-          raumB.textContent = belegung.B;
-          raumB.classList.add("booked-by-other");
+          slotB.classList.add('booked');
+          slotB.textContent = `${slot} (Belegt) - Raum B`;
         }
+      } else {
+        slotB.textContent = `${slot} - Raum B`;
+        slotB.title = "Klicke zum Eintragen";
+        slotB.addEventListener('click', () => {
+          eintragen(selectedDate, slot, 'B');
+        });
+      }
+      timeSlotsB.appendChild(slotB);
+    });
+  }
 
-        zeile.appendChild(info);
-        zeile.appendChild(raumA);
-        zeile.appendChild(raumB);
-        tsDiv.appendChild(zeile);
-      });
+  // Eintragen in Firebase
+  function eintragen(date, timeSlot, room) {
+    if (!aktuellerUser) return;
+    // Check if slot is free
+    const currentBooking = bookings[date]?.[timeSlot]?.[room];
+    if(currentBooking && currentBooking.toLowerCase() !== aktuellerUser.toLowerCase()) {
+      alert("Dieser Termin ist bereits belegt.");
+      return;
     }
+    db.ref(`bookings/${date}/${timeSlot}/${room}`).set(aktuellerUser)
+      .catch(err => alert("Fehler beim Eintragen: " + err.message));
+  }
 
-    window.eintragen = async (tag, zeit, raum) => {
-      const refPath = ref(db, `buchungen/${tag}`);
-      const snapshot = await get(refPath);
-      const data = snapshot.exists() ? snapshot.val() : {};
-      if (!data[zeit]) data[zeit] = { A: "", B: "" };
-      if (!data[zeit][raum]) {
-        data[zeit][raum] = aktuellerUser;
-        await set(refPath, data);
-        ladeZeiten(tag);
-      }
-    };
+  // Austragen in Firebase
+  function austragen(date, timeSlot, room) {
+    if (!aktuellerUser) return;
+    const currentBooking = bookings[date]?.[timeSlot]?.[room];
+    if(currentBooking && currentBooking.toLowerCase() === aktuellerUser.toLowerCase()) {
+      db.ref(`bookings/${date}/${timeSlot}/${room}`).remove()
+        .catch(err => alert("Fehler beim Austragen: " + err.message));
+    }
+  }
 
-    window.austragen = async (tag, zeit, raum) => {
-      const refPath = ref(db, `buchungen/${tag}`);
-      const snapshot = await get(refPath);
-      const data = snapshot.exists() ? snapshot.val() : {};
-      if (data[zeit] && data[zeit][raum] === aktuellerUser) {
-        data[zeit][raum] = "";
-        await set(refPath, data);
-        ladeZeiten(tag);
-      }
-    };
-  </script>
+</script>
+
 </body>
 </html>
