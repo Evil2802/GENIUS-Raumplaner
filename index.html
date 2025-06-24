@@ -3,584 +3,1182 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Raumplanung Nachhilfe</title>
+<title>GENIUS Nachhilfe - Raumplanung</title>
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0;
-    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-    color: #333;
-    min-height: 100vh;
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin: 0; padding: 0;
+background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+color: #333;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+}
+header {
+background: #bcaaa4;
+color: white;
+padding: 15px 20px;
+text-align: center;
+box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+    header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    header p {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+main {
+flex: 1;
+max-width: 900px;
+margin: 20px auto;
+background: white;
+border-radius: 12px;
+padding: 20px 25px;
+box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+.login, .register, .dashboard, .adminPanel { /* Added .register */
+margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #fcfcfc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+    .login, .register { /* Centered login/register elements */
+        text-align: center;
+    }
+    .login input[type="text"],
+    .login input[type="email"],
+    .login input[type="password"],
+    .register input[type="text"],
+    .register input[type="email"],
+    .register input[type="password"] {
+        margin-bottom: 15px;
+        display: block; /* Make inputs block-level for better stacking */
+        width: calc(100% - 24px); /* Adjust width for padding */
+        max-width: 320px;
+        margin-left: auto; /* Center inputs */
+        margin-right: auto; /* Center inputs */
+    }
+    .login button,
+    .register button {
+        margin-top: 5px; /* Space above buttons */
+    }
+    .form-switch-link { /* Style for switch links */
+        margin-top: 15px;
+        font-size: 0.9em;
+        cursor: pointer;
+        color: #bcaaa4;
+        text-decoration: underline;
+    }
+    .form-switch-link:hover {
+        color: #a1887f;
+    }
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+padding: 10px 12px;
+font-size: 1rem;
+border: 2px solid #bcaaa4;
+border-radius: 8px;
+}
+button {
+background-color: #bcaaa4;
+color: white;
+border: none;
+padding: 12px 22px;
+font-size: 1.05rem;
+border-radius: 10px;
+cursor: pointer;
+transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(188,170,164,0.3);
+}
+button:hover {
+background-color: #a1887f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(188,170,164,0.4);
+}
+h2 {
+margin-bottom: 12px;
+color: #555;
+    text-align: center;
+}
+    .current-user-info {
+        background-color: #e0e0e0;
+        padding: 10px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 1rem;
+        text-align: center;
+        color: #555;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+.error {
+color: #c62828;
+margin: 10px 0;
+font-weight: 600;
+}
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 12px;
+font-size: 0.9rem;
+}
+th, td {
+border: 1px solid #ddd;
+padding: 8px 6px;
+text-align: center;
+}
+th {
+background: #f5f5f5;
+}
+.date-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+gap: 12px;
+margin-top: 15px;
+}
+.date-tile {
+background: #f5f5f5;
+padding: 10px 0;
+border-radius: 10px;
+cursor: pointer;
+user-select: none;
+box-shadow: 0 3px 6px rgba(188,170,164,0.2);
+transition: background-color 0.25s ease, transform 0.2s ease;
     display: flex;
     flex-direction: column;
-  }
-  header {
-    background: #3f51b5;
-    color: white;
-    padding: 15px 20px;
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: 700;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  }
-  main {
-    flex: 1;
-    max-width: 900px;
-    margin: 20px auto;
-    background: white;
-    border-radius: 12px;
-    padding: 20px 25px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-  }
-  .login, .dashboard, .adminPanel {
-    margin-top: 20px;
-  }
-  input[type="text"] {
-    padding: 8px 10px;
-    font-size: 1rem;
-    width: 70%;
-    max-width: 320px;
-    border: 2px solid #3f51b5;
-    border-radius: 6px;
-    margin-right: 10px;
-  }
-  button {
-    background-color: #3f51b5;
-    color: white;
-    border: none;
-    padding: 9px 16px;
-    font-size: 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button:hover {
-    background-color: #2c387e;
-  }
-  h2 {
-    margin-bottom: 12px;
-  }
-  .error {
-    color: #c62828;
-    margin: 10px 0;
-    font-weight: 600;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 12px;
-    font-size: 0.9rem;
-  }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px 6px;
-    text-align: center;
-  }
-  th {
-    background: #f3f3f3;
-  }
-  .date-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(130px,1fr));
-    gap: 12px;
-    margin-top: 15px;
-  }
-  .date-tile {
-    background: #e8f0fe;
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    user-select: none;
-    box-shadow: 0 3px 6px rgba(63,81,181,0.2);
-    transition: background-color 0.25s ease;
-  }
-  .date-tile:hover {
-    background: #d1d9ff;
-  }
-  .date-tile.selected {
-    background: #3f51b5;
-    color: white;
-    font-weight: 600;
-  }
-  .time-slots {
-    margin-top: 20px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  .slot {
-    flex: 1 1 90px;
-    min-width: 90px;
-    background-color: #2196f3;
-    color: white;
-    padding: 8px 6px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-    text-align: center;
-    box-shadow: 0 3px 8px rgba(33,150,243,0.4);
-    transition: background-color 0.25s ease;
-  }
-  .slot.booked {
-    background-color: #e57373; /* rot für besetzt */
-    cursor: not-allowed;
-  }
-  .slot.own {
-    background-color: #81c784; /* grün für eigene Buchung */
-    cursor: pointer;
-  }
-  .slot:hover:not(.booked):not(.own) {
-    background-color: #1976d2;
-  }
-  .adminPanel {
-    margin-top: 30px;
-    border-top: 2px solid #3f51b5;
-    padding-top: 20px;
-  }
-  .whitelist-management {
-    margin-top: 10px;
-  }
-  .whitelist-management ul {
-    list-style: none;
-    padding: 0;
-  }
-  .whitelist-management li {
-    background: #f0f0f0;
-    margin: 5px 0;
-    padding: 6px 10px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-  }
-  .whitelist-management button.remove-btn {
-    background: #c62828;
-    padding: 4px 8px;
-    font-size: 0.85rem;
-    border-radius: 4px;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .whitelist-management button.remove-btn:hover {
-    background: #b71c1c;
-  }
-  .add-user-form {
-    margin-top: 10px;
-  }
-  .add-user-form input[type="text"] {
-    width: auto;
-    margin-right: 8px;
-  }
-  footer {
-    text-align: center;
-    padding: 12px 0;
-    color: #666;
-    font-size: 0.9rem;
-  }
+}
+    .date-tile .date-day-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #bcaaa4;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    .date-tile .date-weekday-abbr {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #666;
+    }
+    .date-tile .date-month-abbr {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: #888;
+        margin-top: 3px;
+    }
+.date-tile:hover {
+background: #e0e0e0;
+    transform: translateY(-2px);
+}
+.date-tile.selected {
+background: #bcaaa4;
+color: white;
+font-weight: 600;
+}
+    .date-tile.selected .date-day-number,
+    .date-tile.selected .date-weekday-abbr,
+    .date-tile.selected .date-month-abbr {
+        color: white;
+    }
+
+    .room-selection {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .room-selection label {
+        background-color: #f0f0f0;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.25s ease, border 0.25s ease;
+        border: 2px solid transparent;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .room-selection input[type="radio"] {
+        display: none;
+    }
+    .room-selection input[type="radio"]:checked + label {
+        background-color: #bcaaa4;
+        color: white;
+        border: 2px solid #a1887f;
+        box-shadow: 0 4px 8px rgba(188,170,164,0.3);
+    }
+    .room-selection label:hover {
+        background-color: #e5e5e5;
+    }
+
+.time-slots {
+margin-top: 20px;
+display: flex;
+gap: 15px;
+flex-wrap: wrap;
+}
+.slot {
+flex: 1 1 90px;
+min-width: 90px;
+background-color: #e0e0e0;
+color: #333;
+padding: 8px 6px;
+border-radius: 8px;
+font-weight: 600;
+cursor: pointer;
+user-select: none;
+text-align: center;
+box-shadow: 0 3px 8px rgba(188,170,164,0.4);
+transition: background-color 0.25s ease, transform 0.2s ease;
+}
+.slot.booked {
+background-color: #ef9a9a;
+cursor: not-allowed;
+color: #333;
+}
+.slot.own {
+background-color: #a5d6a7;
+cursor: pointer;
+color: #333;
+}
+.slot:hover:not(.booked):not(.own) {
+background-color: #c0c0c0;
+    transform: translateY(-2px);
+}
+    .slot.booked.admin-override {
+        background-color: #fdd835;
+        color: #333;
+        cursor: pointer;
+    }
+    .slot.booked.admin-override:hover {
+        background-color: #fbc02d;
+    }
+.adminPanel {
+margin-top: 30px;
+border-top: 2px solid #bcaaa4;
+padding-top: 20px;
+}
+.whitelist-management {
+margin-top: 10px;
+}
+.whitelist-management ul {
+list-style: none;
+padding: 0;
+}
+.whitelist-management li {
+background: #f5f5f5;
+margin: 5px 0;
+padding: 6px 10px;
+border-radius: 6px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.whitelist-management button.remove-btn {
+background: #ef5350;
+padding: 4px 8px;
+font-size: 0.85rem;
+border-radius: 4px;
+color: white;
+border: none;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+.whitelist-management button.remove-btn:hover {
+background: #e53935;
+}
+.add-user-form {
+margin-top: 10px;
+}
+.add-user-form input[type="text"] {
+width: auto;
+margin-right: 8px;
+}
+footer {
+text-align: center;
+padding: 12px 0;
+color: #666;
+font-size: 0.9rem;
+}
+
+    /* Custom Modal Styles */
+    #customModal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    #customModal .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        text-align: center;
+        position: relative;
+    }
+
+    #customModal .modal-content button {
+        margin: 5px;
+        min-width: 80px;
+    }
+
+    #customModal .modal-content button#modalCancelBtn {
+        background-color: #666;
+    }
+    #customModal .modal-content button#modalCancelBtn:hover {
+        background-color: #555;
+    }
+
 </style>
 </head>
 <body>
 
-<header>Raumplaner Nachhilfe</header>
+<header>
+    <h1>GENIUS Nachhilfe - Raumplanung</h1>
+    <p>Wolfgang-Heinze-Straße 6b, 18435 Stralsund</p>
+</header>
 
 <main>
 
-  <section class="login">
-    <h2>Login</h2>
-    <input type="text" id="usernameInput" placeholder="Dein Name (z.B. Anna Müller)" autocomplete="off" />
-    <button id="loginBtn">Einloggen</button>
-    <p class="error" id="loginError" style="display:none;"></p>
-  </section>
+<section class="login" id="loginSection">
+<h2>Login</h2>
+<input type="email" id="loginEmailInput" placeholder="E-Mail" />
+<input type="password" id="loginPasswordInput" placeholder="Passwort" />
+<button id="loginBtn">Einloggen</button>
+<p class="error" id="loginError" style="display:none;"></p>
+    <p class="form-switch-link" id="showRegisterLink">Noch kein Konto? Registrieren</p>
+</section>
 
-  <section class="dashboard" style="display:none;">
-    <h2>Willkommen, <span id="userNameDisplay"></span></h2>
-    <p>Klicke auf ein Datum, um Zeiten für Raum A &amp; B zu sehen und dich ein- oder auszutragen.</p>
-    <div id="datesContainer" class="date-grid"></div>
-    <div id="timeSlotsContainer" class="time-slots" style="display:none;"></div>
-    <button id="logoutBtn" style="margin-top:15px;">Ausloggen</button>
-  </section>
+<section class="register" id="registerSection" style="display:none;">
+<h2>Registrieren</h2>
+<input type="text" id="registerNameInput" placeholder="Dein Name (z.B. Anna Müller)" />
+<input type="email" id="registerEmailInput" placeholder="E-Mail" />
+<input type="password" id="registerPasswordInput" placeholder="Passwort" />
+<input type="password" id="registerConfirmPasswordInput" placeholder="Passwort wiederholen" />
+<button id="registerBtn">Registrieren</button>
+<p class="error" id="registerError" style="display:none;"></p>
+    <p class="form-switch-link" id="showLoginLink">Bereits ein Konto? Anmelden</p>
+</section>
 
-  <section class="adminPanel" style="display:none;">
-    <h2>Admin-Bereich</h2>
-    <button id="clearAllBookingsBtn" style="background:#c62828;">Alle Buchungen löschen</button>
-
-    <div class="whitelist-management">
-      <h3>Lehrer-Whitelist verwalten</h3>
-      <ul id="teacherList"></ul>
-      <form id="addTeacherForm" class="add-user-form">
-        <input type="text" id="addTeacherInput" placeholder="Neuen Lehrer hinzufügen" autocomplete="off" />
-        <button type="submit">Hinzufügen</button>
-      </form>
+<section class="dashboard" style="display:none;">
+    <div class="current-user-info">
+        Du bist eingeloggt als: <span id="userNameDisplay"></span>
     </div>
-
-    <div class="whitelist-management" style="margin-top:25px;">
-      <h3>Admin-Whitelist verwalten</h3>
-      <ul id="adminList"></ul>
-      <form id="addAdminForm" class="add-user-form">
-        <input type="text" id="addAdminInput" placeholder="Neuen Admin hinzufügen" autocomplete="off" />
-        <button type="submit">Hinzufügen</button>
-      </form>
+<h2>Termin buchen</h2>
+<p>Klicke auf ein Datum, um Zeiten zu sehen und dich ein- oder auszutragen.</p>
+    <div class="room-selection">
+        <input type="radio" id="room1" name="room" value="Raum 1" checked>
+        <label for="room1">Raum 1</label>
+        <input type="radio" id="room2" name="room" value="Raum 2">
+        <label for="room2">Raum 2</label>
     </div>
-  </section>
+<div id="datesContainer" class="date-grid"></div>
+<div id="timeSlotsContainer" class="time-slots" style="display:none;"></div>
+<button id="logoutBtn" style="margin-top:15px;">Ausloggen</button>
+    <button id="deleteAccountBtn" style="background:#c62828; margin-top:10px;">Konto löschen</button> <!-- NEW: Delete account button -->
+</section>
+
+<section class="adminPanel" style="display:none;">
+<h2>Admin-Bereich</h2>
+<button id="clearAllBookingsBtn" style="background:#ef5350;">Alle Buchungen löschen</button>
+
+<div class="whitelist-management">
+<h3>Lehrer-Whitelist verwalten</h3>
+<ul id="teacherList"></ul>
+<form id="addTeacherForm" class="add-user-form">
+<input type="text" id="addTeacherInput" placeholder="Neuen Lehrer hinzufügen" />
+<button type="submit">Hinzufügen</button>
+</form>
+</div>
+</section>
+
+    <!-- Custom Modal for alerts and confirmations -->
+    <div id="customModal">
+        <div class="modal-content">
+            <p id="modalMessage"></p>
+            <button id="modalConfirmBtn">Ja</button>
+            <button id="modalCancelBtn">Abbrechen</button>
+            <button id="modalOKBtn">OK</button>
+        </div>
+    </div>
 
 </main>
 
 <footer>© 2025 Dein Raumplaner</footer>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- Firebase SDKs -->
+<script type="module">
+    // Corrected Firebase imports for modular SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"; // Added reauthenticateWithCredential, EmailAuthProvider, deleteUser
+    import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot, query, where, addDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"; // Added writeBatch
 
-<script>
-  // === Firebase-Konfiguration ===
-  const firebaseConfig = {
-    apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
-    authDomain: "genius-raumplaner.firebaseapp.com",
-    databaseURL: "https://genius-raumplaner-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "genius-raumplaner",
-    storageBucket: "genius-raumplaner.firebasestorage.app",
-    messagingSenderId: "1081346940014",
-    appId: "1:1081346940014:web:d6b00e0f7d3cd1fb125a7f"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // === Globale Variablen ===
-  let currentUser = null;
-  let isAdmin = false;
-  const DAYS_TO_SHOW = 30;
-  let selectedDate = null;
-
-  // Whitelist aus Firebase laden
-  async function loadWhitelist() {
-    const teachersSnap = await db.ref('whitelist/teachers').once('value');
-    const adminsSnap = await db.ref('whitelist/admins').once('value');
-
-    return {
-      teachers: Object.values(teachersSnap.val() || []),
-      admins: Object.values(adminsSnap.val() || [])
+    // === Firebase-Konfiguration ===
+    // Wichtiger Hinweis: Wenn Sie den Fehler "auth/configuration-not-found" erhalten,
+    // stellen Sie sicher, dass "Email/Password" als Anmeldemethode in Ihrem Firebase-Projekt
+    // (Authentication -> Sign-in method) aktiviert ist.
+    const firebaseConfig = {
+        apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
+        authDomain: "genius-raumplaner.firebaseapp.com",
+        databaseURL: "https://genius-raumplaner-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "genius-raumplaner",
+        storageBucket: "genius-raumplaner.firebasestorage.app",
+        messagingSenderId: "1081346940014",
+        appId: "1:1081346940014:web:d6b00e0f7d3cd1fb125a7f"
     };
-  }
 
-  // Whitelist speichern
-  async function saveWhitelist(type, list) {
-    await db.ref(`whitelist/${type}`).set(list);
-  }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  // Lade Buchungen für Datum
-  async function loadBookings(dateStr) {
-    const snap = await db.ref(`bookings/${dateStr}`).once('value');
-    return snap.val() || {};
-  }
+    // === Globale Variablen ===
+    let currentUser = null; // Stores authenticated user's display name
+    let currentUserEmail = null; // Stores authenticated user's email
+    let isAdmin = false;
+    const DAYS_TO_SHOW = 30;
+    let selectedDate = null;
+    let selectedRoom = 'Raum 1';
 
-  // Buchung speichern / löschen
-  async function toggleBooking(dateStr, timeSlot, user) {
-    const bookingRef = db.ref(`bookings/${dateStr}/${timeSlot}`);
-    const snap = await bookingRef.once('value');
-    const currentBooking = snap.val();
+    // Hardcoded admin names for explicit admin rights
+    const ADMIN_NAMES = ["jeanin birk", "sascha birk"];
 
-    if (currentBooking === user) {
-      // Buchung löschen
-      await bookingRef.remove();
-      return null;
-    } else if (!currentBooking) {
-      // Buchung erstellen
-      await bookingRef.set(user);
-      return user;
-    } else {
-      // Slot besetzt
-      return currentBooking;
-    }
-  }
-
-  // Alle Buchungen löschen (Admin)
-  async function clearAllBookings() {
-    await db.ref('bookings').remove();
-  }
-
-  // Hilfsfunktion: Datum als YYYY-MM-DD formatieren
-  function formatDate(date) {
-    return date.toISOString().split('T')[0];
-  }
-
-  // Hilfsfunktion: Wochentag als Text
-  function getWeekday(date) {
-    const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-    return days[date.getDay()];
-  }
-
-  // Datumsliste generieren
-  function generateDateList() {
-    const dates = [];
-    const today = new Date();
-    for(let i = 0; i < DAYS_TO_SHOW; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      dates.push(d);
-    }
-    return dates;
-  }
-
-  // UI Elemente
-  const loginSection = document.querySelector('.login');
-  const dashboardSection = document.querySelector('.dashboard');
-  const adminSection = document.querySelector('.adminPanel');
-  const loginError = document.getElementById('loginError');
-  const userNameDisplay = document.getElementById('userNameDisplay');
-  const datesContainer = document.getElementById('datesContainer');
-  const timeSlotsContainer = document.getElementById('timeSlotsContainer');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const clearAllBookingsBtn = document.getElementById('clearAllBookingsBtn');
-  const teacherList = document.getElementById('teacherList');
-  const adminList = document.getElementById('adminList');
-  const addTeacherForm = document.getElementById('addTeacherForm');
-  const addTeacherInput = document.getElementById('addTeacherInput');
-  const addAdminForm = document.getElementById('addAdminForm');
-  const addAdminInput = document.getElementById('addAdminInput');
-  const usernameInput = document.getElementById('usernameInput');
-  const loginBtn = document.getElementById('loginBtn');
-
-  let whitelist = { teachers: [], admins: [] };
-  let bookingsForSelectedDate = {};
-
-  // Initial Setup
-  async function init() {
-    whitelist = await loadWhitelist();
-    renderWhitelist();
-  }
-
-  // Login
-  loginBtn.onclick = () => {
-    const name = usernameInput.value.trim();
-    if (!name) {
-      loginError.textContent = "Bitte gib deinen Namen ein.";
-      loginError.style.display = 'block';
-      return;
-    }
-    loginError.style.display = 'none';
-
-    // Check whitelist (case insensitive)
-    const lowerName = name.toLowerCase();
-    const isTeacher = whitelist.teachers.some(n => n.toLowerCase() === lowerName);
-    const isAdminUser = whitelist.admins.some(n => n.toLowerCase() === lowerName);
-
-    if (!isTeacher && !isAdminUser) {
-      loginError.textContent = "Du bist nicht auf der Whitelist.";
-      loginError.style.display = 'block';
-      return;
+    // === Utility function to capitalize the first letter of each word ===
+    function toTitleCase(str) {
+        if (!str) return '';
+        return str.split(' ').map(word => {
+            if (word.length === 0) return '';
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }).join(' ');
     }
 
-    currentUser = name;
-    isAdmin = isAdminUser;
-    showDashboard();
-  };
+    // === Custom Modal Functions ===
+    let resolveModalPromise;
 
-  // Logout
-  logoutBtn.onclick = () => {
-    currentUser = null;
-    isAdmin = false;
-    selectedDate = null;
-    bookingsForSelectedDate = {};
-    timeSlotsContainer.style.display = 'none';
-    dashboardSection.style.display = 'none';
-    adminSection.style.display = 'none';
-    loginSection.style.display = 'block';
-    usernameInput.value = '';
-  };
+    function showModal(message, type = 'alert', onConfirm = null) {
+        const customModal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const modalOKBtn = document.getElementById('modalOKBtn');
 
-  // Dashboard anzeigen
-  function showDashboard() {
-    loginSection.style.display = 'none';
-    dashboardSection.style.display = 'block';
-    adminSection.style.display = isAdmin ? 'block' : 'none';
-    userNameDisplay.textContent = currentUser;
+        modalMessage.textContent = message;
 
-    renderDates();
-  }
+        modalConfirmBtn.style.display = 'none';
+        modalCancelBtn.style.display = 'none';
+        modalOKBtn.style.display = 'none';
 
-  // Datumskacheln rendern
-  function renderDates() {
-    datesContainer.innerHTML = '';
-    const dates = generateDateList();
+        return new Promise(resolve => {
+            resolveModalPromise = resolve;
 
-    dates.forEach(date => {
-      const dateStr = formatDate(date);
-      const weekday = getWeekday(date);
-
-      const div = document.createElement('div');
-      div.className = 'date-tile';
-      div.textContent = `${weekday} ${dateStr}`;
-      div.dataset.date = dateStr;
-
-      div.onclick = () => selectDate(dateStr);
-
-      datesContainer.appendChild(div);
-    });
-  }
-
-  // Datum auswählen
-  async function selectDate(dateStr) {
-    selectedDate = dateStr;
-    highlightSelectedDate();
-
-    bookingsForSelectedDate = await loadBookings(dateStr);
-
-    renderTimeSlots();
-  }
-
-  // Hervorheben des gewählten Datums
-  function highlightSelectedDate() {
-    [...datesContainer.children].forEach(div => {
-      div.classList.toggle('selected', div.dataset.date === selectedDate);
-    });
-  }
-
-  // Slots von 6:00 bis 20:00 im 30-Minuten-Takt generieren
-  function generateTimeSlots() {
-    const slots = [];
-    for (let h = 6; h < 20; h++) {
-      slots.push(`${String(h).padStart(2, '0')}:00`);
-      slots.push(`${String(h).padStart(2, '0')}:30`);
+            if (type === 'confirm') {
+                modalConfirmBtn.style.display = 'inline-block';
+                modalCancelBtn.style.display = 'inline-block';
+                modalConfirmBtn.onclick = () => {
+                    customModal.style.display = 'none';
+                    resolveModalPromise(true);
+                    if (onConfirm) onConfirm();
+                };
+                modalCancelBtn.onclick = () => {
+                    customModal.style.display = 'none';
+                    resolveModalPromise(false);
+                };
+            } else { // 'alert'
+                modalOKBtn.style.display = 'inline-block';
+                modalOKBtn.onclick = () => {
+                    customModal.style.display = 'none';
+                    resolveModalPromise(true);
+                };
+            }
+            customModal.style.display = 'flex';
+        });
     }
-    return slots;
-  }
 
-  // Zeit-Slots rendern
-  function renderTimeSlots() {
-    timeSlotsContainer.innerHTML = '';
-    timeSlotsContainer.style.display = 'flex';
+    // === Firebase Auth State Listener ===
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // User is signed in.
+            currentUserEmail = user.email;
 
-    const slots = generateTimeSlots();
+            // Retrieve display name from Firestore 'users' collection
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDocSnap = await getDoc(userDocRef);
 
-    slots.forEach(slot => {
-      const bookingUser = bookingsForSelectedDate[slot];
-      const slotDiv = document.createElement('div');
-      slotDiv.className = 'slot';
+            if (userDocSnap.exists()) {
+                currentUser = userDocSnap.data().name;
+            } else {
+                // If user document doesn't exist (e.g., deleted manually), sign out
+                console.warn("User document not found for authenticated user:", user.uid);
+                await signOut(auth); // Force sign out if user data is missing
+                return;
+            }
 
-      if (bookingUser) {
-        slotDiv.textContent = bookingUser;
-        if (bookingUser.toLowerCase() === currentUser.toLowerCase()) {
-          slotDiv.classList.add('own');
-          slotDiv.title = 'Klicke zum Austragen';
+            // Determine admin status based on hardcoded names
+            isAdmin = ADMIN_NAMES.includes(currentUser.toLowerCase());
+
+            localStorage.setItem('currentUserUid', user.uid); // Store UID for session persistence
+            localStorage.setItem('currentUser', currentUser);
+            localStorage.setItem('isAdmin', isAdmin);
+
+            showDashboard();
+            await loadWhitelist(); // Reload whitelist after user is authenticated
+            renderWhitelist();
         } else {
-          slotDiv.classList.add('booked');
-          slotDiv.title = 'Bereits gebucht';
+            // User is signed out.
+            currentUser = null;
+            currentUserEmail = null;
+            isAdmin = false;
+            localStorage.removeItem('currentUserUid');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAdmin');
+            showLogin();
         }
-      } else {
-        slotDiv.textContent = slot;
-        slotDiv.title = 'Klicke zum Eintragen';
-      }
+    });
 
-      // Nur freie Slots oder eigene Buchungen sind klickbar
-      if (!bookingUser || bookingUser.toLowerCase() === currentUser.toLowerCase()) {
-        slotDiv.style.cursor = 'pointer';
-        slotDiv.onclick = async () => {
-          const result = await toggleBooking(selectedDate, slot, currentUser);
-          if (result === null) {
-            // Austragen
-            delete bookingsForSelectedDate[slot];
-          } else if (result === currentUser) {
-            bookingsForSelectedDate[slot] = currentUser;
-          } else {
-            alert(`Slot bereits von ${result} gebucht!`);
+    // Whitelist aus Firestore laden (now loads from 'whitelist_teachers' collection)
+    async function loadWhitelist() {
+        const teachersCollectionRef = collection(db, 'whitelist_teachers');
+        const teachersSnapshot = await getDocs(teachersCollectionRef);
+        whitelist.teachers = teachersSnapshot.docs.map(doc => ({ name: doc.data().name, uid: doc.data().uid })); // Store UID with name
+    }
+
+    // Whitelist speichern (for teachers only)
+    async function saveWhitelist(type, list) {
+        if (type === 'teachers') {
+            const teachersCollectionRef = collection(db, 'whitelist_teachers');
+            const batch = writeBatch(db);
+
+            // Fetch current documents to find and delete
+            const currentTeachersSnapshot = await getDocs(teachersCollectionRef);
+            currentTeachersSnapshot.forEach(docSnap => {
+                batch.delete(docSnap.ref);
+            });
+
+            // Add updated list
+            for (const teacher of list) {
+                // Ensure name and uid are consistent if coming from object list
+                batch.set(doc(teachersCollectionRef), { name: teacher.name || teacher, uid: teacher.uid || null }); // Handles both string and object input
+            }
+            await batch.commit();
+        }
+    }
+
+    // Lade Buchungen für Datum und Raum (Firestore)
+    async function loadBookings(dateStr, room) {
+        const bookingDocRef = doc(db, 'bookings', dateStr, 'rooms', room);
+        const docSnap = await getDoc(bookingDocRef);
+        return docSnap.exists() ? docSnap.data() : {};
+    }
+
+    // Buchung speichern / löschen (Firestore)
+    async function toggleBooking(dateStr, room, timeSlot, userDisplayName, isAdminUser) {
+        const bookingDocRef = doc(db, 'bookings', dateStr, 'rooms', room);
+        const currentBookings = await loadBookings(dateStr, room);
+
+        if (currentBookings[timeSlot] && currentBookings[timeSlot].toLowerCase() === userDisplayName.toLowerCase()) {
+            // User's own booking, remove it
+            delete currentBookings[timeSlot];
+            await setDoc(bookingDocRef, currentBookings);
+            return null;
+        } else if (currentBookings[timeSlot] && isAdminUser) {
+            // Admin deleting another user's slot
+            const confirmed = await showModal(`Möchtest du den Termin von ${toTitleCase(currentBookings[timeSlot])} wirklich löschen?`, 'confirm');
+            if (confirmed) {
+                delete currentBookings[timeSlot];
+                await setDoc(bookingDocRef, currentBookings);
+                return null;
+            } else {
+                return currentBookings[timeSlot]; // Admin cancelled
+            }
+        } else if (!currentBookings[timeSlot]) {
+            // Slot is free, book it
+            currentBookings[timeSlot] = userDisplayName;
+            await setDoc(bookingDocRef, currentBookings);
+            return userDisplayName;
+        } else {
+            // Slot is booked by someone else (and not admin trying to delete)
+            return currentBookings[timeSlot];
+        }
+    }
+
+    // NEW: Function to clear bookings by a specific user
+    async function clearUserBookings(userDisplayName) {
+        const bookingsCollectionRef = collection(db, 'bookings');
+        const bookingsSnapshot = await getDocs(bookingsCollectionRef); // Get all date documents
+
+        const batch = writeBatch(db);
+        let bookingsRemovedCount = 0;
+
+        for (const dateDoc of bookingsSnapshot.docs) {
+            const dateStr = dateDoc.id;
+            const roomsCollectionRef = collection(db, 'bookings', dateStr, 'rooms');
+            const roomsSnapshot = await getDocs(roomsCollectionRef); // Get all room documents for this date
+
+            for (const roomDoc of roomsSnapshot.docs) {
+                const roomName = roomDoc.id;
+                const currentBookings = roomDoc.data();
+                let changed = false;
+                const newBookings = { ...currentBookings };
+
+                for (const slot in newBookings) {
+                    if (newBookings[slot].toLowerCase() === userDisplayName.toLowerCase()) {
+                        delete newBookings[slot];
+                        changed = true;
+                        bookingsRemovedCount++;
+                    }
+                }
+                if (changed) {
+                    batch.set(doc(db, 'bookings', dateStr, 'rooms', roomName), newBookings);
+                }
+            }
+        }
+        await batch.commit();
+        return bookingsRemovedCount;
+    }
+
+
+    // Alle Buchungen löschen (Admin) (Firestore)
+    async function clearAllBookings() {
+        const confirmed = await showModal("Alle Buchungen wirklich löschen? Dies kann nicht rückgängig gemacht werden.", 'confirm');
+        if (confirmed) {
+            const bookingsCollectionRef = collection(db, 'bookings');
+            const querySnapshot = await getDocs(bookingsCollectionRef);
+            const batch = writeBatch(db); // Use batch for efficiency
+            querySnapshot.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit(); // Commit all deletions
+            await showModal("Alle Buchungen wurden gelöscht.");
+            if (selectedDate) { // Refresh current view
+                bookingsForSelectedDate = await loadBookings(selectedDate, selectedRoom);
+                renderTimeSlots();
+            }
+        }
+    }
+
+    // Hilfsfunktion: Datum alsenthalt-MM-DD formatieren (for internal use)
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // Hilfsfunktion: Wochentag als Text (for display)
+    function getWeekday(date) {
+        const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+        return days[date.getDay()];
+    }
+
+    // Hilfsfunktion: Monat als Abkürzung
+    function getMonthAbbreviation(date) {
+        const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+        return months[date.getMonth()];
+    }
+
+    // Datumsliste generieren
+    function generateDateList() {
+        const dates = [];
+        const today = new Date();
+        for (let i = 0; i < DAYS_TO_SHOW; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() + i);
+            dates.push(d);
+        }
+        return dates;
+    }
+
+    // UI Elemente
+    const loginSection = document.getElementById('loginSection');
+    const registerSection = document.getElementById('registerSection');
+    const dashboardSection = document.querySelector('.dashboard');
+    const adminSection = document.querySelector('.adminPanel');
+
+    const loginEmailInput = document.getElementById('loginEmailInput');
+    const loginPasswordInput = document.getElementById('loginPasswordInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+
+    const registerNameInput = document.getElementById('registerNameInput');
+    const registerEmailInput = document.getElementById('registerEmailInput');
+    const registerPasswordInput = document.getElementById('registerPasswordInput');
+    const registerConfirmPasswordInput = document.getElementById('registerConfirmPasswordInput');
+    const registerBtn = document.getElementById('registerBtn');
+    const registerError = document.getElementById('registerError');
+
+    const showRegisterLink = document.getElementById('showRegisterLink');
+    const showLoginLink = document.getElementById('showLoginLink');
+
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const datesContainer = document.getElementById('datesContainer');
+    const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn'); // NEW: Delete account button
+
+    const clearAllBookingsBtn = document.getElementById('clearAllBookingsBtn');
+    const teacherList = document.getElementById('teacherList');
+    const addTeacherForm = document.getElementById('addTeacherForm');
+    const addTeacherInput = document.getElementById('addTeacherInput');
+
+    const room1Radio = document.getElementById('room1');
+    const room2Radio = document.getElementById('room2');
+
+    let whitelist = { teachers: [], admins: [] }; // Admins list will not be managed via UI now
+
+    let bookingsForSelectedDate = {};
+
+    // Initial view setup
+    function showLogin() {
+        loginSection.style.display = 'block';
+        registerSection.style.display = 'none';
+        dashboardSection.style.display = 'none';
+        adminSection.style.display = 'none';
+        loginError.style.display = 'none';
+        registerError.style.display = 'none';
+    }
+
+    function showRegister() {
+        loginSection.style.display = 'none';
+        registerSection.style.display = 'block';
+        dashboardSection.style.display = 'none';
+        adminSection.style.display = 'none';
+        loginError.style.display = 'none';
+        registerError.style.display = 'none';
+    }
+
+    // Login logic
+    loginBtn.onclick = async () => {
+        const email = loginEmailInput.value.trim();
+        const password = loginPasswordInput.value.trim();
+        loginError.style.display = 'none';
+
+        if (!email || !password) {
+            loginError.textContent = "Bitte E-Mail und Passwort eingeben.";
+            loginError.style.display = 'block';
             return;
-          }
-          renderTimeSlots();
-        };
-      }
-
-      timeSlotsContainer.appendChild(slotDiv);
-    });
-  }
-
-  // Whitelist rendern
-  function renderWhitelist() {
-    // Lehrer
-    teacherList.innerHTML = '';
-    whitelist.teachers.forEach(name => {
-      const li = document.createElement('li');
-      li.textContent = name;
-      const btn = document.createElement('button');
-      btn.textContent = 'Löschen';
-      btn.className = 'remove-btn';
-      btn.onclick = async () => {
-        if (confirm(`"${name}" wirklich aus der Lehrer-Whitelist löschen?`)) {
-          whitelist.teachers = whitelist.teachers.filter(n => n !== name);
-          await saveWhitelist('teachers', whitelist.teachers);
-          renderWhitelist();
         }
-      };
-      li.appendChild(btn);
-      teacherList.appendChild(li);
-    });
 
-    // Admins
-    adminList.innerHTML = '';
-    whitelist.admins.forEach(name => {
-      const li = document.createElement('li');
-      li.textContent = name;
-      const btn = document.createElement('button');
-      btn.textContent = 'Löschen';
-      btn.className = 'remove-btn';
-      btn.onclick = async () => {
-        if (confirm(`"${name}" wirklich aus der Admin-Whitelist löschen?`)) {
-          whitelist.admins = whitelist.admins.filter(n => n !== name);
-          await saveWhitelist('admins', whitelist.admins);
-          renderWhitelist();
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // onAuthStateChanged will handle UI update
+        } catch (error) {
+            console.error("Login Error:", error.code, error.message);
+            let errorMessage = "Anmeldung fehlgeschlagen. Überprüfen Sie Ihre E-Mail und Ihr Passwort.";
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                errorMessage = "Ungültige E-Mail oder falsches Passwort.";
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = "Ungültiges E-Mail-Format.";
+            }
+            loginError.textContent = errorMessage;
+            loginError.style.display = 'block';
         }
-      };
-      li.appendChild(btn);
-      adminList.appendChild(li);
-    });
-  }
+    };
 
-  // Neuen Lehrer hinzufügen
-  addTeacherForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const name = addTeacherInput.value.trim();
-    if (!name) return;
-    // Prüfen auf Doppelungen (case insensitive)
-    if (whitelist.teachers.some(n => n.toLowerCase() === name.toLowerCase())) {
-      alert("Lehrer bereits auf der Whitelist!");
-      return;
+    // Registration logic
+    registerBtn.onclick = async () => {
+        const name = registerNameInput.value.trim();
+        const email = registerEmailInput.value.trim();
+        const password = registerPasswordInput.value.trim();
+        const confirmPassword = registerConfirmPasswordInput.value.trim();
+        registerError.style.display = 'none';
+
+        if (!name || !email || !password || !confirmPassword) {
+            registerError.textContent = "Bitte füllen Sie alle Felder aus.";
+            registerError.style.display = 'block';
+            return;
+        }
+        if (password.length < 6) {
+            registerError.textContent = "Passwort muss mindestens 6 Zeichen lang sein.";
+            registerError.style.display = 'block';
+            return;
+        }
+        if (password !== confirmPassword) {
+            registerError.textContent = "Passwörter stimmen nicht überein.";
+            registerError.style.display = 'block';
+            return;
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Save user's name to Firestore 'users' collection
+            await setDoc(doc(db, 'users', user.uid), {
+                name: name,
+                email: email,
+                uid: user.uid,
+                isTeacher: true // All registered users are teachers by default
+            });
+
+            // Add user's name and UID to the 'whitelist_teachers' collection
+            const teachersCollectionRef = collection(db, 'whitelist_teachers');
+            await addDoc(teachersCollectionRef, { name: name, uid: user.uid });
+
+            await showModal("Registrierung erfolgreich! Sie sind jetzt angemeldet.", 'alert');
+            // onAuthStateChanged will handle UI update and dashboard display
+        } catch (error) {
+            console.error("Registration Error:", error.code, error.message);
+            let errorMessage = "Registrierung fehlgeschlagen.";
+            if (error.code === 'auth/email-already-in-use') {
+                errorMessage = "Diese E-Mail-Adresse ist bereits registriert.";
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = "Ungültiges E-Mail-Format.";
+            } else if (error.code === 'auth/weak-password') {
+                errorMessage = "Passwort ist zu schwach (min. 6 Zeichen).";
+            }
+            registerError.textContent = errorMessage;
+            registerError.style.display = 'block';
+        }
+    };
+
+    // Toggle between login and register forms
+    showRegisterLink.onclick = showRegister;
+    showLoginLink.onclick = showLogin;
+
+    // Logout
+    logoutBtn.onclick = async () => {
+        try {
+            await signOut(auth);
+            // onAuthStateChanged will handle UI update
+            await showModal("Sie wurden erfolgreich abgemeldet.");
+        } catch (error) {
+            console.error("Logout Error:", error.message);
+            await showModal("Fehler beim Abmelden: " + error.message);
+        }
+    };
+
+    // NEW: Delete current user's account
+    deleteAccountBtn.onclick = async () => {
+        if (!auth.currentUser) {
+            await showModal("Sie sind nicht angemeldet.");
+            return;
+        }
+
+        const confirmed = await showModal("Möchten Sie Ihr Konto wirklich löschen? Dies kann nicht rückgängig gemacht werden. Alle Ihre Daten und Buchungen werden gelöscht.", 'confirm');
+        if (!confirmed) {
+            return;
+        }
+
+        const email = currentUserEmail; // Get email from the current session
+        const password = prompt("Bitte geben Sie Ihr Passwort zur Bestätigung ein:"); // Prompt for password for re-authentication
+
+        if (!password) {
+            await showModal("Passwort zur Bestätigung erforderlich.");
+            return;
+        }
+
+        try {
+            const credential = EmailAuthProvider.credential(email, password);
+            await reauthenticateWithCredential(auth.currentUser, credential);
+
+            const userUid = auth.currentUser.uid;
+            const userDisplayName = currentUser;
+
+            // 1. Delete user's document from 'users' collection
+            await deleteDoc(doc(db, 'users', userUid));
+
+            // 2. Remove user from 'whitelist_teachers' collection
+            const teachersCollectionRef = collection(db, 'whitelist_teachers');
+            const q = query(teachersCollectionRef, where('name', '==', userDisplayName));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (d) => {
+                await deleteDoc(d.ref);
+            });
+
+            // 3. Clear all bookings made by this user
+            await clearUserBookings(userDisplayName);
+
+            // 4. Delete the Firebase Authentication account
+            await deleteUser(auth.currentUser);
+
+            await showModal("Ihr Konto und alle zugehörigen Daten wurden erfolgreich gelöscht.");
+            // onAuthStateChanged will handle UI update and sign out
+        } catch (error) {
+            console.error("Account deletion error:", error.code, error.message);
+            let errorMessage = "Fehler beim Löschen des Kontos.";
+            if (error.code === 'auth/requires-recent-login') {
+                errorMessage = "Diese Aktion erfordert eine kürzliche Anmeldung. Bitte melden Sie sich erneut an und versuchen Sie es noch einmal.";
+            } else if (error.code === 'auth/wrong-password') {
+                errorMessage = "Falsches Passwort. Konto konnte nicht gelöscht werden.";
+            } else if (error.code === 'auth/user-mismatch' || error.code === 'auth/invalid-credential') {
+                 errorMessage = "Ungültige Anmeldeinformationen für die Reauthentifizierung.";
+            } else if (error.code === 'auth/network-request-failed') {
+                 errorMessage = "Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.";
+            }
+            await showModal(errorMessage);
+        }
+    };
+
+
+    // Dashboard anzeigen
+    function showDashboard() {
+        loginSection.style.display = 'none';
+        registerSection.style.display = 'none';
+        dashboardSection.style.display = 'block';
+        adminSection.style.display = isAdmin ? 'block' : 'none';
+        userNameDisplay.textContent = toTitleCase(currentUser);
+
+        renderDates();
+        if (selectedDate) {
+            selectDate(selectedDate);
+        }
     }
-    whitelist.teachers.push(name);
-    await saveWhitelist('teachers', whitelist.teachers);
-    addTeacherInput.value = '';
-    renderWhitelist();
-  };
 
-  // Neuen Admin hinzufügen
-  addAdminForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const name = addAdminInput.value.trim();
-    if (!name) return;
-    if (whitelist.admins.some(n => n.toLowerCase() === name.toLowerCase())) {
-      alert("Admin bereits auf der Whitelist!");
-      return;
+    // Datumskacheln rendern
+    function renderDates() {
+        datesContainer.innerHTML = '';
+        const dates = generateDateList();
+
+        dates.forEach(date => {
+            const dateStr = formatDate(date);
+            const dayNumber = String(date.getDate()).padStart(2, '0');
+            const weekdayAbbr = getWeekday(date);
+            const monthAbbr = getMonthAbbreviation(date);
+
+            const div = document.createElement('div');
+            div.className = 'date-tile';
+            div.dataset.date = dateStr;
+
+            const daySpan = document.createElement('span');
+            daySpan.className = 'date-day-number';
+            daySpan.textContent = dayNumber;
+
+            const weekdaySpan = document.createElement('span');
+            weekdaySpan.className = 'date-weekday-abbr';
+            weekdaySpan.textContent = weekdayAbbr;
+
+            const monthSpan = document.createElement('span');
+            monthSpan.className = 'date-month-abbr';
+            monthSpan.textContent = monthAbbr;
+
+            div.appendChild(daySpan);
+            div.appendChild(weekdaySpan);
+            div.appendChild(monthSpan);
+
+            div.onclick = () => selectDate(dateStr);
+
+            datesContainer.appendChild(div);
+        });
     }
-    whitelist.admins.push(name);
-    await saveWhitelist('admins', whitelist.admins);
-    addAdminInput.value = '';
-    renderWhitelist();
-  };
 
-  // Admin Button: Alle Buchungen löschen
-  clearAllBookingsBtn.onclick = async () => {
-    if (confirm("Alle Buchungen wirklich löschen?")) {
-      await clearAllBookings();
-      if (selectedDate) {
-        bookingsForSelectedDate = await loadBookings(selectedDate);
+    // Datum auswählen
+    async function selectDate(dateStr) {
+        selectedDate = dateStr;
+        highlightSelectedDate();
+
+        bookingsForSelectedDate = await loadBookings(selectedDate, selectedRoom);
         renderTimeSlots();
-      }
     }
-  };
 
-  // Starte App
-  init();
+    // Hervorheben des gewählten Datums
+    function highlightSelectedDate() {
+        [...datesContainer.children].forEach(div => {
+            div.classList.toggle('selected', div.dataset.date === selectedDate);
+        });
+    }
+
+    // Slots von 6:00 bis 20:00 im 30-Minuten-Takt generieren
+    function generateTimeSlots() {
+        const slots = [];
+        for (let h = 6; h <= 20; h++) {
+            slots.push(`${String(h).padStart(2, '0')}:00`);
+            if (h < 20) {
+                slots.push(`${String(h).padStart(2, '0')}:30`);
+            }
+        }
+        return slots;
+    }
+
+    // Zeit-Slots rendern
+    function renderTimeSlots() {
+        timeSlotsContainer.innerHTML = '';
+        timeSlotsContainer.style.display = 'flex';
+
+        const slots = generateTimeSlots();
+
+        slots.forEach(slot => {
+            const bookingUser = bookingsForSelectedDate[slot];
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'slot';
+
+            if (bookingUser) {
+                slotDiv.textContent = toTitleCase(bookingUser);
+                if (currentUser && bookingUser.toLowerCase() === currentUser.toLowerCase()) {
+                    slotDiv.classList.add('own');
+                    slotDiv.title = 'Klicke zum Austragen';
+                } else if (isAdmin) {
+                    slotDiv.classList.add('booked', 'admin-override');
+                    slotDiv.title = `Gebucht von ${toTitleCase(bookingUser)} (Klicke zum Löschen)`;
+                } else {
+                    slotDiv.classList.add('booked');
+                    slotDiv.title = 'Bereits gebucht';
+                }
+            } else {
+                slotDiv.textContent = slot;
+                slotDiv.title = 'Klicke zum Eintragen';
+            }
+
+            if (!bookingUser || (currentUser && bookingUser.toLowerCase() === currentUser.toLowerCase()) || isAdmin) {
+                slotDiv.style.cursor = 'pointer';
+                slotDiv.onclick = async () => {
+                    if (!currentUser) {
+                        await showModal("Bitte logge dich zuerst ein, um einen Slot zu buchen.");
+                        return;
+                    }
+                    const result = await toggleBooking(selectedDate, selectedRoom, slot, currentUser, isAdmin);
+                    if (result === null) {
+                        delete bookingsForSelectedDate[slot];
+                    } else if (result === currentUser) {
+                        bookingsForSelectedDate[slot] = currentUser;
+                    } else {
+                        await showModal(`Slot bereits von ${toTitleCase(result)} gebucht!`);
+                        return;
+                    }
+                    renderTimeSlots();
+                };
+            }
+
+            timeSlotsContainer.appendChild(slotDiv);
+        });
+    }
+
+    // Whitelist rendern (only teachers)
+    function renderWhitelist() {
+        teacherList.innerHTML = '';
+        whitelist.teachers.forEach(teacher => { // Iterate over teacher objects now
+            const li = document.createElement('li');
+            li.textContent = toTitleCase(teacher.name);
+            const btn = document.createElement('button');
+            btn.textContent = 'Löschen';
+            btn.className = 'remove-btn';
+            btn.onclick = async () => {
+                // Prevent admin from deleting other admin accounts
+                if (ADMIN_NAMES.includes(teacher.name.toLowerCase())) {
+                    await showModal("Admins können keine anderen Admin-Konten löschen.");
+                    return;
+                }
+
+                const confirmed = await showModal(`"${toTitleCase(teacher.name)}" wirklich aus der Lehrer-Whitelist löschen und zugehörige Buchungen entfernen?`, 'confirm');
+                if (confirmed) {
+                    try {
+                        // 1. Remove from 'whitelist_teachers' collection
+                        const teachersCollectionRef = collection(db, 'whitelist_teachers');
+                        const q = query(teachersCollectionRef, where('uid', '==', teacher.uid)); // Use UID for precise deletion
+                        const querySnapshot = await getDocs(q);
+                        querySnapshot.forEach(async (d) => {
+                            await deleteDoc(d.ref);
+                        });
+
+                        // 2. Delete user's document from 'users' collection (if it exists)
+                        if (teacher.uid) { // Ensure UID exists
+                            await deleteDoc(doc(db, 'users', teacher.uid));
+                        }
+
+                        // 3. Clear all bookings made by this teacher
+                        await clearUserBookings(teacher.name); // Clear bookings by name (since bookings store name)
+
+                        // 4. (Optional - Requires Admin SDK on server): Attempt to delete Firebase Auth user.
+                        //    This part cannot be done directly from the client for another user.
+                        //    You would need a Firebase Cloud Function or a separate backend server
+                        //    using the Firebase Admin SDK to perform auth.deleteUser(uid).
+                        console.log(`NOTE: Firebase Auth account for ${teacher.name} (UID: ${teacher.uid}) could not be deleted directly from client-side. Requires Admin SDK.`);
+                        await showModal(`Lehrer "${toTitleCase(teacher.name)}" wurde von der Whitelist und seine Buchungen gelöscht. Das Auth-Konto muss ggf. manuell gelöscht werden.`, 'alert');
+
+
+                        await loadWhitelist(); // Reload whitelist to update UI
+                        renderWhitelist();
+                        if (selectedDate) { // Refresh current view if necessary
+                            bookingsForSelectedDate = await loadBookings(selectedDate, selectedRoom);
+                            renderTimeSlots();
+                        }
+                    } catch (error) {
+                        console.error("Error deleting teacher:", error);
+                        await showModal("Fehler beim Löschen des Lehrers.");
+                    }
+                }
+            };
+            li.appendChild(btn);
+            teacherList.appendChild(li);
+        });
+    }
+
+    // Neuen Lehrer hinzufügen (via Admin Panel)
+    addTeacherForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const name = addTeacherInput.value.trim();
+        if (!name) return;
+
+        // Check for duplicates (case insensitive)
+        const teachersCollectionRef = collection(db, 'whitelist_teachers');
+        const q = query(teachersCollectionRef, where('name', '==', name));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            await showModal("Lehrer bereits auf der Whitelist!");
+            return;
+        }
+
+        // Admins cannot directly add other admins via this panel
+        if (ADMIN_NAMES.includes(name.toLowerCase())) {
+            await showModal("Admin-Konten können nicht über dieses Panel hinzugefügt werden.");
+            addTeacherInput.value = '';
+            return;
+        }
+
+        try {
+            // Note: This only adds to whitelist_teachers, not Firebase Auth.
+            // A proper registration for teachers should go through the register form.
+            // If adding here, the user won't have an Auth account unless manually created.
+            await addDoc(teachersCollectionRef, { name: name, uid: null }); // UID is null for manually added teachers
+            await showModal(`Lehrer "${toTitleCase(name)}" zur Whitelist hinzugefügt. (Hinweis: Für vollen Zugriff muss sich der Lehrer ggf. registrieren.)`);
+            addTeacherInput.value = '';
+            await loadWhitelist(); // Reload whitelist to update UI
+            renderWhitelist();
+        } catch (error) {
+            console.error("Error adding teacher:", error);
+            await showModal("Fehler beim Hinzufügen des Lehrers.");
+        }
+    };
+
+    // Admin Button: Alle Buchungen löschen
+    clearAllBookingsBtn.onclick = async () => {
+        await clearAllBookings();
+    };
+
+    // Event listeners for room selection
+    room1Radio.addEventListener('change', () => {
+        selectedRoom = 'Raum 1';
+        if (selectedDate) {
+            selectDate(selectedDate);
+        }
+    });
+
+    room2Radio.addEventListener('change', () => {
+        selectedRoom = 'Raum 2';
+        if (selectedDate) {
+            selectDate(selectedDate);
+        }
+    });
+
+    // Initial load is handled by onAuthStateChanged, no need for separate init()
 </script>
-
 </body>
 </html>
