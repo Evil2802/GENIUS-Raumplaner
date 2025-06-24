@@ -2,67 +2,89 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Raumplaner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raumplaner mit Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .container {
-      max-width: 1000px;
-      margin: 30px auto;
-      background: white;
-      padding: 20px;
+      background: #fff;
+      color: #333;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      padding: 30px 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 25px rgba(0,0,0,0.2);
+      text-align: center;
     }
     h2 {
-      text-align: center;
-      color: #333;
+      margin-bottom: 15px;
+      color: #2575fc;
     }
-    .login, .calendar, .timeslots {
-      margin-top: 20px;
+    .login-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0;
     }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin: 10px 0;
-      font-size: 1rem;
-    }
-    button {
-      padding: 8px 16px;
-      background: #007bff;
+    .login-list button {
+      background: #6a11cb;
       border: none;
       color: white;
-      font-size: 1rem;
-      border-radius: 5px;
+      padding: 12px 20px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+      user-select: none;
     }
-    button:hover {
-      background: #0056b3;
+    .login-list button:hover {
+      background: #2575fc;
+    }
+    #dashboard {
+      display: none;
+      text-align: left;
+    }
+    #userDisplay {
+      font-weight: 700;
+      color: #2575fc;
     }
     .calendar-grid {
+      margin-top: 15px;
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 10px;
-      margin-top: 10px;
     }
     .day {
-      padding: 10px;
-      background: #e9ecef;
-      border-radius: 6px;
+      background: #e0e7ff;
+      color: #333;
+      padding: 10px 5px;
+      border-radius: 8px;
       cursor: pointer;
+      user-select: none;
+      transition: background 0.25s ease;
+      font-weight: 600;
       text-align: center;
     }
     .day:hover {
-      background: #dee2e6;
+      background: #a5b4fc;
+      color: #1e40af;
     }
     .selected-day {
-      background: #007bff !important;
-      color: white;
+      background: #4338ca !important;
+      color: white !important;
+      font-weight: 700;
+      box-shadow: 0 0 8px #4338ca;
     }
     .timeslots {
       margin-top: 20px;
@@ -71,42 +93,61 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
-      padding: 6px;
-      background: #f9f9f9;
-      border-radius: 4px;
+      padding: 8px 12px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: #111827;
     }
     .slot-row span {
       flex: 1;
+    }
+    .slot-row button {
+      background: #4338ca;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .slot-row button:hover {
+      background: #3730a3;
+    }
+    .slot-row .booked-by-other {
+      color: #6b7280;
+      font-style: italic;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Raumplaner Nachhilfe</h2>
-    <div class="login" id="loginBox">
-      <p>Gib deinen Namen ein:</p>
-      <input type="text" id="username" placeholder="z. B. Anna Müller" />
-      <button onclick="login()">Einloggen</button>
+    <h2>Raumplaner Nachhilfe — Login</h2>
+
+    <div id="loginBox">
+      <p>Bitte wähle deinen Namen aus:</p>
+      <div class="login-list" id="loginList">
+        <!-- Buttons für erlaubte Namen kommen hier rein -->
+      </div>
     </div>
 
-    <div id="dashboard" style="display:none">
-      <h3>Willkommen, <span id="userDisplay"></span></h3>
+    <div id="dashboard">
+      <p>Angemeldet als: <span id="userDisplay"></span></p>
 
-      <div class="calendar">
-        <h4>Wähle ein Datum:</h4>
-        <div class="calendar-grid" id="calendarDays"></div>
-      </div>
+      <h3>Wähle ein Datum:</h3>
+      <div class="calendar-grid" id="calendarDays"></div>
 
       <div class="timeslots" id="timeslots"></div>
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+    // Deine Firebase-Konfiguration (prüfe die Daten)
     const firebaseConfig = {
       apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
       authDomain: "genius-raumplaner.firebaseapp.com",
@@ -120,14 +161,34 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const tage = Array.from({ length: 30 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      const day = d.toLocaleDateString("de-DE", { weekday: 'short' });
-      const iso = d.toISOString().split('T')[0];
-      return { label: `${day} ${iso}`, key: iso };
+    // Whitelist erlaubter Nutzer (hier kannst du neue Namen ergänzen)
+    const erlaubteNamen = [
+      "Anna Müller",
+      "Max Mustermann",
+      "Lisa Schmidt",
+      "Tom Becker",
+      "Julia Klein"
+    ];
+
+    let aktuellerUser = "";
+    let ausgewähltesDatum = "";
+
+    // Render Login-Buttons für erlaubte Nutzer
+    const loginListDiv = document.getElementById("loginList");
+    erlaubteNamen.forEach(name => {
+      const btn = document.createElement("button");
+      btn.textContent = name;
+      btn.onclick = () => {
+        aktuellerUser = name;
+        document.getElementById("userDisplay").textContent = aktuellerUser;
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        renderKalender();
+      };
+      loginListDiv.appendChild(btn);
     });
 
+    // 30-Minuten-Zeitslots von 6:00 bis 20:00
     const zeiten = Array.from({ length: 28 }, (_, i) => {
       const h = 6 + Math.floor(i / 2);
       const m = i % 2 === 0 ? "00" : "30";
@@ -138,18 +199,14 @@
       return `${start}-${end}`;
     });
 
-    let aktuellerUser = "";
-    let ausgewähltesDatum = "";
-
-    function login() {
-      const name = document.getElementById("username").value.trim();
-      if (!name) return alert("Bitte Namen eingeben.");
-      aktuellerUser = name;
-      document.getElementById("userDisplay").innerText = aktuellerUser;
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("dashboard").style.display = "block";
-      renderKalender();
-    }
+    // 30 Tage ab heute als Kalender anzeigen mit Wochentagen
+    const tage = Array.from({ length: 30 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      const day = d.toLocaleDateString("de-DE", { weekday: 'short' });
+      const iso = d.toISOString().split('T')[0];
+      return { label: `${day} ${iso}`, key: iso };
+    });
 
     function renderKalender() {
       const grid = document.getElementById("calendarDays");
@@ -157,9 +214,10 @@
       tage.forEach(d => {
         const el = document.createElement("div");
         el.className = "day";
-        el.innerText = d.label;
+        el.textContent = d.label;
         el.onclick = () => {
           ausgewähltesDatum = d.key;
+          // Markierung setzen
           [...grid.children].forEach(c => c.classList.remove("selected-day"));
           el.classList.add("selected-day");
           ladeZeiten(d.key);
@@ -170,27 +228,37 @@
 
     async function ladeZeiten(tag) {
       const tsDiv = document.getElementById("timeslots");
-      tsDiv.innerHTML = `<h4>${tag} – Belegung</h4>`;
+      tsDiv.innerHTML = `<h3>${tag} – Belegung</h3>`;
       const snapshot = await get(ref(db, "buchungen/" + tag));
       const data = snapshot.exists() ? snapshot.val() : {};
       zeiten.forEach(zeit => {
         const belegung = data[zeit] || { A: "", B: "" };
         const zeile = document.createElement("div");
         zeile.className = "slot-row";
+
         const info = document.createElement("span");
-        info.textContent = `${zeit}`;
+        info.textContent = zeit;
+
         const raumA = document.createElement("span");
-        raumA.innerHTML = belegung.A
-          ? belegung.A === aktuellerUser
-            ? `${belegung.A} <button onclick="austragen('${tag}','${zeit}','A')">Austragen</button>`
-            : belegung.A
-          : `<button onclick="eintragen('${tag}','${zeit}','A')">Raum A buchen</button>`;
+        if (!belegung.A) {
+          raumA.innerHTML = `<button onclick="eintragen('${tag}','${zeit}','A')">Raum A buchen</button>`;
+        } else if (belegung.A === aktuellerUser) {
+          raumA.innerHTML = `${belegung.A} <button onclick="austragen('${tag}','${zeit}','A')">Austragen</button>`;
+        } else {
+          raumA.textContent = belegung.A;
+          raumA.classList.add("booked-by-other");
+        }
+
         const raumB = document.createElement("span");
-        raumB.innerHTML = belegung.B
-          ? belegung.B === aktuellerUser
-            ? `${belegung.B} <button onclick="austragen('${tag}','${zeit}','B')">Austragen</button>`
-            : belegung.B
-          : `<button onclick="eintragen('${tag}','${zeit}','B')">Raum B buchen</button>`;
+        if (!belegung.B) {
+          raumB.innerHTML = `<button onclick="eintragen('${tag}','${zeit}','B')">Raum B buchen</button>`;
+        } else if (belegung.B === aktuellerUser) {
+          raumB.innerHTML = `${belegung.B} <button onclick="austragen('${tag}','${zeit}','B')">Austragen</button>`;
+        } else {
+          raumB.textContent = belegung.B;
+          raumB.classList.add("booked-by-other");
+        }
+
         zeile.appendChild(info);
         zeile.appendChild(raumA);
         zeile.appendChild(raumB);
@@ -198,7 +266,8 @@
       });
     }
 
-    async function eintragen(tag, zeit, raum) {
+    // Die Funktionen müssen global sein, damit sie in onclick funktionieren:
+    window.eintragen = async (tag, zeit, raum) => {
       const refPath = ref(db, `buchungen/${tag}`);
       const snapshot = await get(refPath);
       const data = snapshot.exists() ? snapshot.val() : {};
@@ -208,9 +277,9 @@
         await set(refPath, data);
         ladeZeiten(tag);
       }
-    }
+    };
 
-    async function austragen(tag, zeit, raum) {
+    window.austragen = async (tag, zeit, raum) => {
       const refPath = ref(db, `buchungen/${tag}`);
       const snapshot = await get(refPath);
       const data = snapshot.exists() ? snapshot.val() : {};
@@ -219,7 +288,7 @@
         await set(refPath, data);
         ladeZeiten(tag);
       }
-    }
+    };
   </script>
 </body>
 </html>
