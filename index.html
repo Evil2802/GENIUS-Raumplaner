@@ -29,18 +29,24 @@
       margin-bottom: 15px;
       color: #2575fc;
     }
-    .login-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin: 20px 0;
+    input[type="text"] {
+      width: 80%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #2575fc;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.3s ease;
     }
-    .login-list button {
+    input[type="text"]:focus {
+      border-color: #6a11cb;
+    }
+    button {
       background: #6a11cb;
       border: none;
       color: white;
-      padding: 12px 20px;
+      padding: 12px 25px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
@@ -48,12 +54,13 @@
       transition: background 0.3s ease;
       user-select: none;
     }
-    .login-list button:hover {
+    button:hover {
       background: #2575fc;
     }
     #dashboard {
       display: none;
       text-align: left;
+      margin-top: 20px;
     }
     #userDisplay {
       font-weight: 700;
@@ -120,6 +127,12 @@
       color: #6b7280;
       font-style: italic;
     }
+    #errorMsg {
+      color: red;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -127,10 +140,10 @@
     <h2>Raumplaner Nachhilfe — Login</h2>
 
     <div id="loginBox">
-      <p>Bitte wähle deinen Namen aus:</p>
-      <div class="login-list" id="loginList">
-        <!-- Buttons für erlaubte Namen kommen hier rein -->
-      </div>
+      <p>Bitte gib deinen Namen ein:</p>
+      <input type="text" id="usernameInput" placeholder="z.B. Anna Müller" />
+      <div id="errorMsg">Bitte gib einen Namen ein.</div>
+      <button id="loginBtn">Anmelden</button>
     </div>
 
     <div id="dashboard">
@@ -147,7 +160,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // Deine Firebase-Konfiguration (prüfe die Daten)
     const firebaseConfig = {
       apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
       authDomain: "genius-raumplaner.firebaseapp.com",
@@ -161,32 +173,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Whitelist erlaubter Nutzer (hier kannst du neue Namen ergänzen)
-    const erlaubteNamen = [
-      "Anna Müller",
-      "Max Mustermann",
-      "Lisa Schmidt",
-      "Tom Becker",
-      "Julia Klein"
-    ];
-
     let aktuellerUser = "";
     let ausgewähltesDatum = "";
-
-    // Render Login-Buttons für erlaubte Nutzer
-    const loginListDiv = document.getElementById("loginList");
-    erlaubteNamen.forEach(name => {
-      const btn = document.createElement("button");
-      btn.textContent = name;
-      btn.onclick = () => {
-        aktuellerUser = name;
-        document.getElementById("userDisplay").textContent = aktuellerUser;
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
-        renderKalender();
-      };
-      loginListDiv.appendChild(btn);
-    });
 
     // 30-Minuten-Zeitslots von 6:00 bis 20:00
     const zeiten = Array.from({ length: 28 }, (_, i) => {
@@ -207,6 +195,24 @@
       const iso = d.toISOString().split('T')[0];
       return { label: `${day} ${iso}`, key: iso };
     });
+
+    const loginBtn = document.getElementById("loginBtn");
+    const usernameInput = document.getElementById("usernameInput");
+    const errorMsg = document.getElementById("errorMsg");
+
+    loginBtn.onclick = () => {
+      const name = usernameInput.value.trim();
+      if (!name) {
+        errorMsg.style.display = "block";
+        return;
+      }
+      errorMsg.style.display = "none";
+      aktuellerUser = name;
+      document.getElementById("userDisplay").textContent = aktuellerUser;
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      renderKalender();
+    };
 
     function renderKalender() {
       const grid = document.getElementById("calendarDays");
@@ -266,7 +272,6 @@
       });
     }
 
-    // Die Funktionen müssen global sein, damit sie in onclick funktionieren:
     window.eintragen = async (tag, zeit, raum) => {
       const refPath = ref(db, `buchungen/${tag}`);
       const snapshot = await get(refPath);
