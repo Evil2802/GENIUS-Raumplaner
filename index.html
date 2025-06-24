@@ -1,401 +1,585 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Raumplanung Nachhilfe</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #eef2f7;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .login, .dashboard {
-      max-width: 900px;
-      width: 100%;
-      background: white;
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-top: 0;
-      color: #2c3e50;
-      font-weight: 700;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 10px;
-      font-size: 1rem;
-      border: 2px solid #2980b9;
-      border-radius: 6px;
-      margin-bottom: 15px;
-      box-sizing: border-box;
-      transition: border-color 0.3s;
-    }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #1abc9c;
-      box-shadow: 0 0 5px #1abc9c;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      font-weight: 600;
-      background-color: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover:not(:disabled) {
-      background-color: #1abc9c;
-    }
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: default;
-    }
-    .error {
-      color: #e74c3c;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
-
-    /* Kalender Styles */
-    #monthContainer {
-      margin-top: 30px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
-    }
-    .dayCard {
-      background: #f7f9fc;
-      border-radius: 10px;
-      width: 110px;
-      padding: 12px 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.15s;
-      user-select: none;
-    }
-    .dayCard:hover {
-      background-color: #d0f0e4;
-      transform: translateY(-3px);
-    }
-    .dayCard.selected {
-      background-color: #1abc9c;
-      color: white;
-      font-weight: 700;
-      transform: translateY(-5px);
-      box-shadow: 0 5px 12px rgba(26,188,156,0.5);
-    }
-    .dayLabel {
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #34495e;
-      margin-bottom: 6px;
-      text-align: center;
-    }
-    .dateLabel {
-      font-size: 1.3rem;
-      font-weight: 700;
-      text-align: center;
-      user-select: none;
-    }
-
-    /* Zeitfenster */
-    #timeSlotsContainer {
-      margin-top: 25px;
-      max-width: 900px;
-      background: white;
-      border-radius: 12px;
-      padding: 20px 25px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      display: none;
-    }
-    .timeSlot {
-      border: 1.5px solid #2980b9;
-      border-radius: 8px;
-      margin: 5px;
-      padding: 12px 8px;
-      cursor: pointer;
-      user-select: none;
-      display: inline-block;
-      width: 120px;
-      text-align: center;
-      font-weight: 600;
-      color: #2980b9;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .timeSlot.booked {
-      background-color: #e74c3c;
-      color: white;
-      cursor: default;
-      border-color: #c0392b;
-    }
-    .timeSlot.bookedByUser {
-      background-color: #27ae60;
-      color: white;
-      border-color: #1e8449;
-    }
-    .timeSlot:hover:not(.booked) {
-      background-color: #1abc9c;
-      color: white;
-      border-color: #16a085;
-    }
-    #selectedDateTitle {
-      font-weight: 700;
-      font-size: 1.3rem;
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Raumplanung Nachhilfe</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #3f51b5;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  main {
+    flex: 1;
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 20px 25px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  }
+  .login, .dashboard, .adminPanel {
+    margin-top: 20px;
+  }
+  input[type="text"] {
+    padding: 8px 10px;
+    font-size: 1rem;
+    width: 70%;
+    max-width: 320px;
+    border: 2px solid #3f51b5;
+    border-radius: 6px;
+    margin-right: 10px;
+  }
+  button {
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    padding: 9px 16px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #2c387e;
+  }
+  h2 {
+    margin-bottom: 12px;
+  }
+  .error {
+    color: #c62828;
+    margin: 10px 0;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px 6px;
+    text-align: center;
+  }
+  th {
+    background: #f3f3f3;
+  }
+  .date-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(130px,1fr));
+    gap: 12px;
+    margin-top: 15px;
+  }
+  .date-tile {
+    background: #e8f0fe;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 3px 6px rgba(63,81,181,0.2);
+    transition: background-color 0.25s ease;
+  }
+  .date-tile:hover {
+    background: #d1d9ff;
+  }
+  .date-tile.selected {
+    background: #3f51b5;
+    color: white;
+    font-weight: 600;
+  }
+  .time-slots {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .slot {
+    flex: 1 1 90px;
+    min-width: 90px;
+    background-color: #2196f3;
+    color: white;
+    padding: 8px 6px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    box-shadow: 0 3px 8px rgba(33,150,243,0.4);
+    transition: background-color 0.25s ease;
+  }
+  .slot.booked {
+    background-color: #e57373; /* rot für besetzt */
+    cursor: not-allowed;
+  }
+  .slot.own {
+    background-color: #81c784; /* grün für eigene Buchung */
+    cursor: pointer;
+  }
+  .slot:hover:not(.booked):not(.own) {
+    background-color: #1976d2;
+  }
+  .adminPanel {
+    margin-top: 30px;
+    border-top: 2px solid #3f51b5;
+    padding-top: 20px;
+  }
+  .whitelist-management {
+    margin-top: 10px;
+  }
+  .whitelist-management ul {
+    list-style: none;
+    padding: 0;
+  }
+  .whitelist-management li {
+    background: #f0f0f0;
+    margin: 5px 0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .whitelist-management button.remove-btn {
+    background: #c62828;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .whitelist-management button.remove-btn:hover {
+    background: #b71c1c;
+  }
+  .add-user-form {
+    margin-top: 10px;
+  }
+  .add-user-form input[type="text"] {
+    width: auto;
+    margin-right: 8px;
+  }
+  footer {
+    text-align: center;
+    padding: 12px 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+</style>
 </head>
 <body>
 
-<div class="login" id="loginBox">
-  <h2>Login</h2>
-  <p>Gib deinen Namen ein (nur erlaubte Personen):</p>
-  <input type="text" id="username" placeholder="z. B. Anna Müller" autocomplete="off" />
-  <div class="error" id="loginError" style="display:none;"></div>
-  <button id="loginBtn">Einloggen</button>
-</div>
+<header>Raumplaner Nachhilfe</header>
 
-<div class="dashboard" id="dashboard" style="display:none">
-  <h2>Willkommen, <span id="userDisplay"></span></h2>
-  <p>Wähle ein Datum unten aus und trage dich für 30 Minuten Zeitfenster in Raum A oder B ein.</p>
+<main>
 
-  <div id="monthContainer"></div>
+  <section class="login">
+    <h2>Login</h2>
+    <input type="text" id="usernameInput" placeholder="Dein Name (z.B. Anna Müller)" autocomplete="off" />
+    <button id="loginBtn">Einloggen</button>
+    <p class="error" id="loginError" style="display:none;"></p>
+  </section>
 
-  <div id="timeSlotsContainer">
-    <div id="selectedDateTitle"></div>
-    <div><strong>Raum A</strong></div>
-    <div id="timeSlotsA"></div>
-    <br>
-    <div><strong>Raum B</strong></div>
-    <div id="timeSlotsB"></div>
-  </div>
-</div>
+  <section class="dashboard" style="display:none;">
+    <h2>Willkommen, <span id="userNameDisplay"></span></h2>
+    <p>Klicke auf ein Datum, um Zeiten für Raum A &amp; B zu sehen und dich ein- oder auszutragen.</p>
+    <div id="datesContainer" class="date-grid"></div>
+    <div id="timeSlotsContainer" class="time-slots" style="display:none;"></div>
+    <button id="logoutBtn" style="margin-top:15px;">Ausloggen</button>
+  </section>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <section class="adminPanel" style="display:none;">
+    <h2>Admin-Bereich</h2>
+    <button id="clearAllBookingsBtn" style="background:#c62828;">Alle Buchungen löschen</button>
+
+    <div class="whitelist-management">
+      <h3>Lehrer-Whitelist verwalten</h3>
+      <ul id="teacherList"></ul>
+      <form id="addTeacherForm" class="add-user-form">
+        <input type="text" id="addTeacherInput" placeholder="Neuen Lehrer hinzufügen" autocomplete="off" />
+        <button type="submit">Hinzufügen</button>
+      </form>
+    </div>
+
+    <div class="whitelist-management" style="margin-top:25px;">
+      <h3>Admin-Whitelist verwalten</h3>
+      <ul id="adminList"></ul>
+      <form id="addAdminForm" class="add-user-form">
+        <input type="text" id="addAdminInput" placeholder="Neuen Admin hinzufügen" autocomplete="off" />
+        <button type="submit">Hinzufügen</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>© 2025 Dein Raumplaner</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-  // Firebase-Konfiguration hier einsetzen (deine Daten)
+  // === Firebase-Konfiguration ===
   const firebaseConfig = {
     apiKey: "AIzaSyApOdRm_xgUhPbeBeFJ6NPHOt4LSBUJiIo",
     authDomain: "genius-raumplaner.firebaseapp.com",
-    databaseURL: "https://genius-raumplaner-default-rtdb.europe-west1.firebasedatabase.app/",
+    databaseURL: "https://genius-raumplaner-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "genius-raumplaner",
-    storageBucket: "genius-raumplaner.appspot.com",
+    storageBucket: "genius-raumplaner.firebasestorage.app",
     messagingSenderId: "1081346940014",
     appId: "1:1081346940014:web:d6b00e0f7d3cd1fb125a7f"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  // Zulässige Namen (Whitelist), Kleinschreibung ignorieren
-  const allowedUsers = ["anna müller", "max mustermann", "lara schmidt"];
-
-  let aktuellerUser = "";
+  // === Globale Variablen ===
+  let currentUser = null;
+  let isAdmin = false;
+  const DAYS_TO_SHOW = 30;
   let selectedDate = null;
-  let bookings = {}; // alle Buchungen aus DB
 
-  // Hilfsfunktion: Zeitfenster von 6:00 bis 20:00 in 30 Min Schritten
-  function generateTimeSlots(startHour = 6, endHour = 20) {
-    const slots = [];
-    for (let h = startHour; h < endHour; h++) {
-      slots.push(`${String(h).padStart(2, "0")}:00-${String(h).padStart(2, "0")}:30`);
-      slots.push(`${String(h).padStart(2, "0")}:30-${String(h+1).padStart(2, "0")}:00`);
-    }
-    return slots;
+  // Whitelist aus Firebase laden
+  async function loadWhitelist() {
+    const teachersSnap = await db.ref('whitelist/teachers').once('value');
+    const adminsSnap = await db.ref('whitelist/admins').once('value');
+
+    return {
+      teachers: Object.values(teachersSnap.val() || []),
+      admins: Object.values(adminsSnap.val() || [])
+    };
   }
 
-  const timeSlots = generateTimeSlots();
-
-  // Erstelle 30 Tage ab heute als Datum-Strings + Wochentage
-  function getDaysArray() {
-    const days = [];
-    const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-    for(let i=0; i<30; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
-      days.push({
-        date: dateStr,
-        dayName: dayNames[d.getDay()],
-        dayNum: d.getDate()
-      });
-    }
-    return days;
+  // Whitelist speichern
+  async function saveWhitelist(type, list) {
+    await db.ref(`whitelist/${type}`).set(list);
   }
 
-  // UI-Elemente
-  const loginBox = document.getElementById('loginBox');
-  const dashboard = document.getElementById('dashboard');
-  const userDisplay = document.getElementById('userDisplay');
-  const monthContainer = document.getElementById('monthContainer');
-  const timeSlotsContainer = document.getElementById('timeSlotsContainer');
-  const selectedDateTitle = document.getElementById('selectedDateTitle');
-  const timeSlotsA = document.getElementById('timeSlotsA');
-  const timeSlotsB = document.getElementById('timeSlotsB');
+  // Lade Buchungen für Datum
+  async function loadBookings(dateStr) {
+    const snap = await db.ref(`bookings/${dateStr}`).once('value');
+    return snap.val() || {};
+  }
+
+  // Buchung speichern / löschen
+  async function toggleBooking(dateStr, timeSlot, user) {
+    const bookingRef = db.ref(`bookings/${dateStr}/${timeSlot}`);
+    const snap = await bookingRef.once('value');
+    const currentBooking = snap.val();
+
+    if (currentBooking === user) {
+      // Buchung löschen
+      await bookingRef.remove();
+      return null;
+    } else if (!currentBooking) {
+      // Buchung erstellen
+      await bookingRef.set(user);
+      return user;
+    } else {
+      // Slot besetzt
+      return currentBooking;
+    }
+  }
+
+  // Alle Buchungen löschen (Admin)
+  async function clearAllBookings() {
+    await db.ref('bookings').remove();
+  }
+
+  // Hilfsfunktion: Datum als YYYY-MM-DD formatieren
+  function formatDate(date) {
+    return date.toISOString().split('T')[0];
+  }
+
+  // Hilfsfunktion: Wochentag als Text
+  function getWeekday(date) {
+    const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    return days[date.getDay()];
+  }
+
+  // Datumsliste generieren
+  function generateDateList() {
+    const dates = [];
+    const today = new Date();
+    for(let i = 0; i < DAYS_TO_SHOW; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      dates.push(d);
+    }
+    return dates;
+  }
+
+  // UI Elemente
+  const loginSection = document.querySelector('.login');
+  const dashboardSection = document.querySelector('.dashboard');
+  const adminSection = document.querySelector('.adminPanel');
   const loginError = document.getElementById('loginError');
+  const userNameDisplay = document.getElementById('userNameDisplay');
+  const datesContainer = document.getElementById('datesContainer');
+  const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const clearAllBookingsBtn = document.getElementById('clearAllBookingsBtn');
+  const teacherList = document.getElementById('teacherList');
+  const adminList = document.getElementById('adminList');
+  const addTeacherForm = document.getElementById('addTeacherForm');
+  const addTeacherInput = document.getElementById('addTeacherInput');
+  const addAdminForm = document.getElementById('addAdminForm');
+  const addAdminInput = document.getElementById('addAdminInput');
+  const usernameInput = document.getElementById('usernameInput');
   const loginBtn = document.getElementById('loginBtn');
-  const usernameInput = document.getElementById('username');
 
-  // Login Event
-  loginBtn.addEventListener('click', () => {
-    const enteredName = usernameInput.value.trim();
-    if (!enteredName) {
-      showError("Bitte gib deinen Namen ein.");
-      return;
-    }
-    if (!allowedUsers.includes(enteredName.toLowerCase())) {
-      showError("Dein Name ist nicht in der Liste der erlaubten Nutzer.");
-      return;
-    }
-    aktuellerUser = enteredName;
-    loginBox.style.display = "none";
-    dashboard.style.display = "block";
-    userDisplay.textContent = aktuellerUser;
-    loginError.style.display = "none";
-    loadBookings();
-    renderCalendar();
-  });
+  let whitelist = { teachers: [], admins: [] };
+  let bookingsForSelectedDate = {};
 
-  function showError(msg) {
-    loginError.style.display = "block";
-    loginError.textContent = msg;
+  // Initial Setup
+  async function init() {
+    whitelist = await loadWhitelist();
+    renderWhitelist();
   }
 
-  // Kalender rendern
-  function renderCalendar() {
-    monthContainer.innerHTML = "";
-    const days = getDaysArray();
-    days.forEach(day => {
-      const card = document.createElement('div');
-      card.classList.add('dayCard');
-      card.dataset.date = day.date;
-      card.innerHTML = `
-        <div class="dayLabel">${day.dayName}</div>
-        <div class="dateLabel">${day.dayNum}</div>
-      `;
-      card.addEventListener('click', () => {
-        selectDate(day.date);
-      });
-      monthContainer.appendChild(card);
+  // Login
+  loginBtn.onclick = () => {
+    const name = usernameInput.value.trim();
+    if (!name) {
+      loginError.textContent = "Bitte gib deinen Namen ein.";
+      loginError.style.display = 'block';
+      return;
+    }
+    loginError.style.display = 'none';
+
+    // Check whitelist (case insensitive)
+    const lowerName = name.toLowerCase();
+    const isTeacher = whitelist.teachers.some(n => n.toLowerCase() === lowerName);
+    const isAdminUser = whitelist.admins.some(n => n.toLowerCase() === lowerName);
+
+    if (!isTeacher && !isAdminUser) {
+      loginError.textContent = "Du bist nicht auf der Whitelist.";
+      loginError.style.display = 'block';
+      return;
+    }
+
+    currentUser = name;
+    isAdmin = isAdminUser;
+    showDashboard();
+  };
+
+  // Logout
+  logoutBtn.onclick = () => {
+    currentUser = null;
+    isAdmin = false;
+    selectedDate = null;
+    bookingsForSelectedDate = {};
+    timeSlotsContainer.style.display = 'none';
+    dashboardSection.style.display = 'none';
+    adminSection.style.display = 'none';
+    loginSection.style.display = 'block';
+    usernameInput.value = '';
+  };
+
+  // Dashboard anzeigen
+  function showDashboard() {
+    loginSection.style.display = 'none';
+    dashboardSection.style.display = 'block';
+    adminSection.style.display = isAdmin ? 'block' : 'none';
+    userNameDisplay.textContent = currentUser;
+
+    renderDates();
+  }
+
+  // Datumskacheln rendern
+  function renderDates() {
+    datesContainer.innerHTML = '';
+    const dates = generateDateList();
+
+    dates.forEach(date => {
+      const dateStr = formatDate(date);
+      const weekday = getWeekday(date);
+
+      const div = document.createElement('div');
+      div.className = 'date-tile';
+      div.textContent = `${weekday} ${dateStr}`;
+      div.dataset.date = dateStr;
+
+      div.onclick = () => selectDate(dateStr);
+
+      datesContainer.appendChild(div);
     });
   }
 
   // Datum auswählen
-  function selectDate(date) {
-    selectedDate = date;
-    selectedDateTitle.textContent = `Gebuchte Zeiten am ${selectedDate}`;
-    timeSlotsContainer.style.display = "block";
+  async function selectDate(dateStr) {
+    selectedDate = dateStr;
+    highlightSelectedDate();
 
-    // Markiere ausgewählten Tag
-    document.querySelectorAll('.dayCard').forEach(card => {
-      card.classList.toggle('selected', card.dataset.date === date);
-    });
+    bookingsForSelectedDate = await loadBookings(dateStr);
 
     renderTimeSlots();
   }
 
-  // Lade alle Buchungen aus Firebase
-  function loadBookings() {
-    db.ref('bookings').on('value', (snapshot) => {
-      bookings = snapshot.val() || {};
-      if(selectedDate) renderTimeSlots();
+  // Hervorheben des gewählten Datums
+  function highlightSelectedDate() {
+    [...datesContainer.children].forEach(div => {
+      div.classList.toggle('selected', div.dataset.date === selectedDate);
     });
   }
 
-  // Zeitfenster anzeigen mit Buchungsstatus
+  // Slots von 6:00 bis 20:00 im 30-Minuten-Takt generieren
+  function generateTimeSlots() {
+    const slots = [];
+    for (let h = 6; h < 20; h++) {
+      slots.push(`${String(h).padStart(2, '0')}:00`);
+      slots.push(`${String(h).padStart(2, '0')}:30`);
+    }
+    return slots;
+  }
+
+  // Zeit-Slots rendern
   function renderTimeSlots() {
-    timeSlotsA.innerHTML = "";
-    timeSlotsB.innerHTML = "";
+    timeSlotsContainer.innerHTML = '';
+    timeSlotsContainer.style.display = 'flex';
 
-    timeSlots.forEach(slot => {
-      // Raum A
-      const bookedByA = bookings[selectedDate]?.[slot]?.A || "";
-      const slotA = document.createElement('div');
-      slotA.className = "timeSlot";
-      if(bookedByA) {
-        if(bookedByA.toLowerCase() === aktuellerUser.toLowerCase()) {
-          slotA.classList.add('bookedByUser');
-          slotA.textContent = `${slot} (Du) - Raum A`;
-          slotA.title = "Klicke zum Austragen";
-          slotA.addEventListener('click', () => {
-            austragen(selectedDate, slot, 'A');
-          });
+    const slots = generateTimeSlots();
+
+    slots.forEach(slot => {
+      const bookingUser = bookingsForSelectedDate[slot];
+      const slotDiv = document.createElement('div');
+      slotDiv.className = 'slot';
+
+      if (bookingUser) {
+        slotDiv.textContent = bookingUser;
+        if (bookingUser.toLowerCase() === currentUser.toLowerCase()) {
+          slotDiv.classList.add('own');
+          slotDiv.title = 'Klicke zum Austragen';
         } else {
-          slotA.classList.add('booked');
-          slotA.textContent = `${slot} (Belegt) - Raum A`;
+          slotDiv.classList.add('booked');
+          slotDiv.title = 'Bereits gebucht';
         }
       } else {
-        slotA.textContent = `${slot} - Raum A`;
-        slotA.title = "Klicke zum Eintragen";
-        slotA.addEventListener('click', () => {
-          eintragen(selectedDate, slot, 'A');
-        });
+        slotDiv.textContent = slot;
+        slotDiv.title = 'Klicke zum Eintragen';
       }
-      timeSlotsA.appendChild(slotA);
 
-      // Raum B
-      const bookedByB = bookings[selectedDate]?.[slot]?.B || "";
-      const slotB = document.createElement('div');
-      slotB.className = "timeSlot";
-      if(bookedByB) {
-        if(bookedByB.toLowerCase() === aktuellerUser.toLowerCase()) {
-          slotB.classList.add('bookedByUser');
-          slotB.textContent = `${slot} (Du) - Raum B`;
-          slotB.title = "Klicke zum Austragen";
-          slotB.addEventListener('click', () => {
-            austragen(selectedDate, slot, 'B');
-          });
-        } else {
-          slotB.classList.add('booked');
-          slotB.textContent = `${slot} (Belegt) - Raum B`;
-        }
-      } else {
-        slotB.textContent = `${slot} - Raum B`;
-        slotB.title = "Klicke zum Eintragen";
-        slotB.addEventListener('click', () => {
-          eintragen(selectedDate, slot, 'B');
-        });
+      // Nur freie Slots oder eigene Buchungen sind klickbar
+      if (!bookingUser || bookingUser.toLowerCase() === currentUser.toLowerCase()) {
+        slotDiv.style.cursor = 'pointer';
+        slotDiv.onclick = async () => {
+          const result = await toggleBooking(selectedDate, slot, currentUser);
+          if (result === null) {
+            // Austragen
+            delete bookingsForSelectedDate[slot];
+          } else if (result === currentUser) {
+            bookingsForSelectedDate[slot] = currentUser;
+          } else {
+            alert(`Slot bereits von ${result} gebucht!`);
+            return;
+          }
+          renderTimeSlots();
+        };
       }
-      timeSlotsB.appendChild(slotB);
+
+      timeSlotsContainer.appendChild(slotDiv);
     });
   }
 
-  // Eintragen in Firebase
-  function eintragen(date, timeSlot, room) {
-    if (!aktuellerUser) return;
-    // Check if slot is free
-    const currentBooking = bookings[date]?.[timeSlot]?.[room];
-    if(currentBooking && currentBooking.toLowerCase() !== aktuellerUser.toLowerCase()) {
-      alert("Dieser Termin ist bereits belegt.");
+  // Whitelist rendern
+  function renderWhitelist() {
+    // Lehrer
+    teacherList.innerHTML = '';
+    whitelist.teachers.forEach(name => {
+      const li = document.createElement('li');
+      li.textContent = name;
+      const btn = document.createElement('button');
+      btn.textContent = 'Löschen';
+      btn.className = 'remove-btn';
+      btn.onclick = async () => {
+        if (confirm(`"${name}" wirklich aus der Lehrer-Whitelist löschen?`)) {
+          whitelist.teachers = whitelist.teachers.filter(n => n !== name);
+          await saveWhitelist('teachers', whitelist.teachers);
+          renderWhitelist();
+        }
+      };
+      li.appendChild(btn);
+      teacherList.appendChild(li);
+    });
+
+    // Admins
+    adminList.innerHTML = '';
+    whitelist.admins.forEach(name => {
+      const li = document.createElement('li');
+      li.textContent = name;
+      const btn = document.createElement('button');
+      btn.textContent = 'Löschen';
+      btn.className = 'remove-btn';
+      btn.onclick = async () => {
+        if (confirm(`"${name}" wirklich aus der Admin-Whitelist löschen?`)) {
+          whitelist.admins = whitelist.admins.filter(n => n !== name);
+          await saveWhitelist('admins', whitelist.admins);
+          renderWhitelist();
+        }
+      };
+      li.appendChild(btn);
+      adminList.appendChild(li);
+    });
+  }
+
+  // Neuen Lehrer hinzufügen
+  addTeacherForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const name = addTeacherInput.value.trim();
+    if (!name) return;
+    // Prüfen auf Doppelungen (case insensitive)
+    if (whitelist.teachers.some(n => n.toLowerCase() === name.toLowerCase())) {
+      alert("Lehrer bereits auf der Whitelist!");
       return;
     }
-    db.ref(`bookings/${date}/${timeSlot}/${room}`).set(aktuellerUser)
-      .catch(err => alert("Fehler beim Eintragen: " + err.message));
-  }
+    whitelist.teachers.push(name);
+    await saveWhitelist('teachers', whitelist.teachers);
+    addTeacherInput.value = '';
+    renderWhitelist();
+  };
 
-  // Austragen in Firebase
-  function austragen(date, timeSlot, room) {
-    if (!aktuellerUser) return;
-    const currentBooking = bookings[date]?.[timeSlot]?.[room];
-    if(currentBooking && currentBooking.toLowerCase() === aktuellerUser.toLowerCase()) {
-      db.ref(`bookings/${date}/${timeSlot}/${room}`).remove()
-        .catch(err => alert("Fehler beim Austragen: " + err.message));
+  // Neuen Admin hinzufügen
+  addAdminForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const name = addAdminInput.value.trim();
+    if (!name) return;
+    if (whitelist.admins.some(n => n.toLowerCase() === name.toLowerCase())) {
+      alert("Admin bereits auf der Whitelist!");
+      return;
     }
-  }
+    whitelist.admins.push(name);
+    await saveWhitelist('admins', whitelist.admins);
+    addAdminInput.value = '';
+    renderWhitelist();
+  };
 
+  // Admin Button: Alle Buchungen löschen
+  clearAllBookingsBtn.onclick = async () => {
+    if (confirm("Alle Buchungen wirklich löschen?")) {
+      await clearAllBookings();
+      if (selectedDate) {
+        bookingsForSelectedDate = await loadBookings(selectedDate);
+        renderTimeSlots();
+      }
+    }
+  };
+
+  // Starte App
+  init();
 </script>
 
 </body>
