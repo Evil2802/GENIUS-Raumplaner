@@ -966,20 +966,36 @@ function generateDateList() {
     return dates;
 }
 
-/**
- * Generates a list of time slots from 06:00 to 20:00 in 30-minute intervals.
- * @returns {string[]} - An array of time slot strings (e.g., "06:00", "06:30").
- */
-function generateTimeSlots() {
-    const slots = [];
-    for (let h = 6; h <= 20; h++) {
-        slots.push(`${String(h).padStart(2, '0')}:00`);
-        if (h < 20) { // Don't add :30 for 20:00, as it's the last slot
-            slots.push(`${String(h).padStart(2, '0')}:30`);
+    /**
+     * Generates a list of time slot intervals from 06:00 to 20:00 in 30-minute steps.
+     * @returns {string[]} - An array of time slot interval strings (e.g., "06:00 - 06:30").
+     */
+    function generateTimeSlots() {
+        const slots = [];
+        // Start bei 6 Uhr und gehe bis kurz vor 20 Uhr, um das 19:30 - 20:00 Intervall zu inkludieren.
+        for (let h = 6; h < 20; h++) {
+            // Erste Hälfte der Stunde (z.B. 06:00 - 06:30)
+            let startHourFormatted = String(h).padStart(2, '0');
+            let endHourFormatted = String(h).padStart(2, '0');
+
+            slots.push(`${startHourFormatted}:00 - ${endHourFormatted}:30`);
+
+            // Zweite Hälfte der Stunde (z.B. 06:30 - 07:00)
+            // Hier muss die Endzeit die nächste volle Stunde sein
+            let nextHour = h + 1;
+            let nextHourFormatted = String(nextHour).padStart(2, '0');
+
+            // Füge nur hinzu, wenn die nächste Stunde nicht 20:00 Uhr überschreitet.
+            // Das letzte Intervall soll 19:30 - 20:00 sein.
+            if (!(h === 19 && nextHour === 20)) { // Vermeide 19:30 - 20:00 hier, da es speziell behandelt wird.
+                 slots.push(`${startHourFormatted}:30 - ${nextHourFormatted}:00`);
+            }
         }
+        // Füge das letzte Intervall 19:30 - 20:00 explizit hinzu
+        slots.push("19:30 - 20:00"); 
+
+        return slots;
     }
-    return slots;
-}
 
 // === UI Element References ===
 const loginSection = document.getElementById('loginSection');
