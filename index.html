@@ -347,12 +347,6 @@ th {
     padding-top: 20px;
 }
 
-/* Center button container for "Alle Buchungen löschen" */
-.admin-button-center {
-    text-align: center;
-    margin-bottom: 20px; /* Space below the button */
-}
-
 /* User Management in Admin Panel */
 .user-management {
     margin-top: 20px;
@@ -583,9 +577,7 @@ footer {
 <!-- Admin Panel Section -->
 <section class="adminPanel" style="display:none;">
     <h2>Admin-Bereich</h2>
-    <div class="admin-button-center">
-        <button id="clearAllBookingsBtn" style="background:#ef5350;">Alle Buchungen löschen</button>
-    </div>
+    <!-- Der Button "Alle Buchungen löschen" wurde entfernt -->
 
     <div class="user-management">
         <h3>Nachhilfelehrer-Verwaltung (Genehmigung)</h3>
@@ -598,7 +590,8 @@ footer {
 <div id="customModal">
     <div class="modal-content">
         <p id="modalMessage"></p>
-        <input type="password" id="modalPasswordInput" style="display:none; margin: 10px auto;" placeholder="Passwort eingeben" />
+        <!-- Geändert von modalPasswordInput zu modalTextInput und Placeholder-Text angepasst -->
+        <input type="email" id="modalTextInput" style="display:none; margin: 10px auto;" placeholder="E-Mail eingeben" />
         <button id="modalConfirmBtn">Ja</button>
         <button id="modalCancelBtn">Abbrechen</button>
         <button id="modalOKBtn">OK</button>
@@ -641,7 +634,7 @@ let currentUserEmail = null; // Stores authenticated user's email
 let isAdmin = false;
 let currentUserData = null; // Stores the full user document data from Firestore
 const DAYS_TO_SHOW = 30; // Number of days to show for booking
-let selectedDate = null; // Currently selected date in форматеYYYY-MM-DD
+let selectedDate = null; // Currently selected date in formateYYYY-MM-DD
 let selectedRoom = 'Raum 1'; // Currently selected room
 
 // Hardcoded admin names for explicit admin rights (for UI logic only)
@@ -674,7 +667,8 @@ function showModal(message, type = 'alert') {
     const modalConfirmBtn = document.getElementById('modalConfirmBtn');
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalOKBtn = document.getElementById('modalOKBtn');
-    const modalPasswordInput = document.getElementById('modalPasswordInput');
+    // Geändert von modalPasswordInput zu modalTextInput
+    const modalTextInput = document.getElementById('modalTextInput');
 
     modalMessage.textContent = message;
 
@@ -682,8 +676,9 @@ function showModal(message, type = 'alert') {
     modalConfirmBtn.style.display = 'none';
     modalCancelBtn.style.display = 'none';
     modalOKBtn.style.display = 'none';
-    modalPasswordInput.style.display = 'none'; // Hide password input by default
-    modalPasswordInput.value = ''; // Clear input value
+    // Geändert von modalPasswordInput zu modalTextInput
+    modalTextInput.style.display = 'none'; // Hide text input by default
+    modalTextInput.value = ''; // Clear input value
 
     return new Promise(resolve => {
         resolveModalPromise = resolve; // Store resolve function to be called by button click handlers
@@ -700,11 +695,13 @@ function showModal(message, type = 'alert') {
                 resolveModalPromise(false); // Resolve with false for cancel
             };
         } else if (type === 'prompt') {
-            modalPasswordInput.style.display = 'block'; // Show password input
+            // Geändert von modalPasswordInput zu modalTextInput
+            modalTextInput.type = 'text'; // Ensure it's a text input
+            modalTextInput.style.display = 'block'; // Show text input
             modalOKBtn.style.display = 'inline-block';
             modalOKBtn.onclick = () => {
                 customModal.style.display = 'none';
-                resolveModalPromise(modalPasswordInput.value); // Resolve with the input value
+                resolveModalPromise(modalTextInput.value); // Resolve with the input value
             };
         } else { // Default to 'alert' type
             modalOKBtn.style.display = 'inline-block';
@@ -918,32 +915,10 @@ async function clearUserBookings(userDisplayName) {
     return bookingsRemovedCount;
 }
 
-/**
- * Clears all bookings in the entire system (admin function).
- */
-async function clearAllBookings() {
-    // Confirm with admin before proceeding
-    const confirmed = await showModal("Alle Buchungen wirklich löschen? Dies kann nicht rückgängig gemacht werden.", 'confirm');
-    if (confirmed) {
-        const bookingsCollectionRef = collection(db, 'bookings');
-        const querySnapshot = await getDocs(bookingsCollectionRef); // Get all date documents
-        const batch = writeBatch(db); // Use a batch for efficiency
-
-        for (const dateDoc of querySnapshot.docs) {
-            const roomsCollectionRef = collection(db, 'bookings', dateDoc.id, 'rooms');
-            const roomsSnapshot = await getDocs(roomsCollectionRef);
-            for (const roomDoc of roomsSnapshot.docs) {
-                batch.delete(roomDoc.ref); // Delete each room document (which contains bookings for that room/date)
-            }
-        }
-        await batch.commit(); // Commit all deletions
-        await showModal("Alle Buchungen wurden gelöscht.", 'alert');
-        if (selectedDate) { // Refresh current view if a date is selected
-            bookingsForSelectedDate = await loadBookings(selectedDate, selectedRoom);
-            renderTimeSlots();
-        }
-    }
-}
+// Die Funktion clearAllBookings ist nicht mehr erforderlich, da der Button entfernt wurde.
+// async function clearAllBookings() {
+//     // ... (Funktionsinhalt hier) ...
+// }
 
 // === Date and Time Utility Functions ===
 
@@ -1034,7 +1009,7 @@ const timeSlotsContainer = document.getElementById('timeSlotsContainer');
 const logoutBtn = document.getElementById('logoutBtn');
 const deleteAccountBtn = document.getElementById('deleteAccountBtn'); // Reference to delete account button
 
-const clearAllBookingsBtn = document.getElementById('clearAllBookingsBtn');
+// const clearAllBookingsBtn = document.getElementById('clearAllBookingsBtn'); // REFERENZ ENTFERNT
 const userList = document.getElementById('userList'); // Reference for user approval management list
 const room1Radio = document.getElementById('room1');
 const room2Radio = document.getElementById('room2');
@@ -1113,9 +1088,19 @@ loginBtn.onclick = async () => {
 
 // Forgot Password link click handler
 forgotPasswordLink.onclick = async () => {
-    const email = loginEmailInput.value.trim();
+    // Prompt for email using the custom modal
+    const email = await showModal("Bitte geben Sie Ihre E-Mail-Adresse ein, um Ihr Passwort zurückzusetzen.", 'prompt');
+
     if (!email) {
-        await showModal("Bitte geben Sie Ihre E-Mail-Adresse in das Login-Feld ein, um Ihr Passwort zurückzusetzen.", 'alert');
+        // User cancelled the prompt or entered an empty string
+        await showModal("E-Mail zur Passwortrücksetzung erforderlich.", 'alert');
+        return;
+    }
+
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        await showModal("Ungültiges E-Mail-Format. Bitte geben Sie eine gültige E-Mail-Adresse ein.", 'alert');
         return;
     }
 
@@ -1400,10 +1385,10 @@ function renderTimeSlots() {
     });
 }
 
-// Admin Button: Clear All Bookings
-clearAllBookingsBtn.onclick = async () => {
-    await clearAllBookings();
-};
+// Admin Button: Clear All Bookings - ENTFERNT
+// clearAllBookingsBtn.onclick = async () => {
+//     await clearAllBookings();
+// };
 
 /**
  * Renders the list of users in the admin panel for approval management.
